@@ -1,46 +1,119 @@
-.main-nav {
-    position: relative; /* 로고 위치를 절대값으로 잡기 위해 */
+/* src/components/Nav.css */
+
+.navbar {
+    display: flex;
+    justify-content: space-between; /* 각 섹션(왼쪽, 중앙, 오른쪽)을 균등하게 분배 */
+    align-items: center;
+    padding: 12px 2rem; /* 상하 12px, 좌우 2rem 패딩 */
+    border-bottom: 1px solid #e0e0e0; /* 이미지의 얇은 하단 테두리 */
+    background-color: #ffffff; /* 흰색 배경 */
     width: 100%;
-    height: 70px;
-    background-color: #ffffff00;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    padding: 0 300px;
+    box-sizing: border-box; /* 패딩이 너비에 영향을 주지 않도록 설정 */
+}
+
+/* 모든 섹션에 공통 적용 */
+.nav-section {
     display: flex;
     align-items: center;
 }
 
-.logo-container {
-    position: relative;
-    top: 0;
-    left: 20px;
-    height: 70px;
-    display: flex;
-    align-items: center; /* 위쪽 정렬 */
+/* 왼쪽 섹션 (로고) */
+.nav-left {
+    flex: 1; /* 공간을 차지하도록 설정 */
+    justify-content: flex-start; /* 왼쪽 정렬 */
+    gap: 20px;
 }
 
-.logo {
-    height: 60px;
+.nav-logo {
+    font-size: 1.6rem; /* 로고 폰트 크기 */
+    font-weight: bold;
+    /* 이미지와 유사한 느낌의 폰트를 우선 적용, 없으면 기본 serif */
+    font-family: 'Gowun Batang', serif;
+    color: #5d4037; /* 이미지의 갈색 톤 로고 색상 */
+    text-decoration: none;
+}
+
+/* 중앙 섹션 (검색창) */
+.nav-center {
+    flex: 2; /* 중앙 섹션이 더 많은 공간을 차지하도록 설정 */
+    justify-content: center; /* 가운데 정렬 */
+    padding: 0 1rem; /* 좌우 다른 섹션과 간격 */
+}
+
+.search-container {
+    position: relative; /* 아이콘 위치 기준 */
+    width: 100%;
+    max-width: 450px; /* 검색창 최대 너비 */
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 16px 10px 40px; /* 아이콘을 위한 왼쪽 패딩 */
+    border: 1px solid #ccc;
+    border-radius: 30px; /* 이미지처럼 둥근 모서리 */
+    font-size: 1rem;
+    box-sizing: border-box;
+    outline: none; /* 클릭 시 테두리 제거 */
+}
+
+.search-input::placeholder {
+    color: #aaa;
+}
+
+.search-input:focus {
+    border-color: #888; /* 클릭 시 테두리 색상 */
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px; /* 아이콘 위치 */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa; /* 아이콘 색상 */
+    font-size: 1.1rem;
+}
+
+/* 오른쪽 섹션 (링크, 버튼) */
+.nav-right {
+    flex: 1.5; /* 공간 비율 설정 */
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    gap: 2rem; /* 링크 그룹과 '입점' 버튼 사이 간격 */
 }
 
 .nav-links {
-    margin-left: auto; /* 오른쪽 정렬 */
-    list-style: none;
     display: flex;
-    gap: 20px;
-    align-items: center;
+    list-style: none; /* ul 태그의 점 제거 */
+    margin: 0;
+    padding: 0;
+    gap: 1.5rem; /* 각 링크 사이의 간격 */
 }
 
 .nav-links li a {
-    text-decoration: none;
-    color: #f2f2f2;
-    transition: 0.3s;
-    user-select: none; /* 추가: 텍스트 선택 불가 */
+    text-decoration: none; /* 밑줄 제거 */
+    color: #333; /* 기본 글자 색상 */
+    font-size: 1rem;
+    transition: color 0.2s;
 }
 
-.logout-btn {
-    cursor: pointer;
-    color: #222;
-    background: none;
+.nav-links li a:hover {
+    color: #000;
+    font-weight: 500;
+}
+
+.nav-register-button {
+    padding: 10px 24px;
+    background-color: #553b2e; /* 이미지의 갈색 버튼 */
+    color: white;
+    text-decoration: none;
     border: none;
-    user-select: none; /* 추가 */
+    border-radius: 8px; /* 둥근 모서리 */
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    white-space: nowrap; /* '입점' 글자 줄바꿈 방지 */
+}
+
+.nav-register-button:hover {
+    background-color: #2e1e19; /* 호버 시 약간 더 어두운 갈색 */
 }
