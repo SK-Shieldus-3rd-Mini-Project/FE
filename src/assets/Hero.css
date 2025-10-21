@@ -11,7 +11,7 @@
 
     /* --- 배경 이미지 수정 --- */
     background: linear-gradient(rgba(80, 60, 50, 0.4), rgba(80, 60, 50, 0.4)),
-    url('https://via.placeholder.com/1280x400/8d6e63/FFFFFF?text=JeonBongJun+AI+Banner');
+    url('https://dummyimage.com/1280x400/8d6e63/FFFFFF.png&text=JeonBongJun+AI+Banner');
     background-size: cover;
     background-position: center;
 
