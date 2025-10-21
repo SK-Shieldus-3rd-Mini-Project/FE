@@ -8,7 +8,6 @@ import '../assets/MainPage.css';
 import jbj1 from '../assets/images/전봉준.jpg'
 import jbj2 from '../assets/images/전봉준2.webp'
 
-// 임시 데이터: AI가 분석한 전통적 투자 포트폴리오
 const recommendedPortfolios = [
     {
         id: 'p1',
@@ -16,7 +15,7 @@ const recommendedPortfolios = [
         description: 'AI가 분석한 저평가 우량주 중심 포트폴리오입니다.',
         tag: '가치 투자',
         // --- 이미지 수정 ---
-        imageUrl: jbj1
+        imageUrl: 'https://dummyimage.com/300x200/f3f1ef/8d6e63.png&text=Value+Stocks'
     },
     {
         id: 'p2',
@@ -24,7 +23,7 @@ const recommendedPortfolios = [
         description: '지속 가능한 현금 흐름을 창출하는 배당주입니다.',
         tag: '저위험',
         // --- 이미지 수정 ---
-        imageUrl: jbj2
+        imageUrl: 'https://dummyimage.com/300x200/f3f1ef/8d6e63.png&text=Dividends'
     },
     {
         id: 'p3',
@@ -32,11 +31,10 @@ const recommendedPortfolios = [
         description: '금리 변동성을 고려한 단기/장기 채권 혼합입니다.',
         tag: '안정형',
         // --- 이미지 수정 ---
-        imageUrl: jbj1
+        imageUrl: 'https://dummyimage.com/300x200/f3f1ef/8d6e63.png&text=Bonds'
     },
 ];
 
-// 임시 데이터: 최신 마켓 인사이트
 const marketInsights = [
     {
         id: 'm1',
@@ -44,7 +42,7 @@ const marketInsights = [
         description: 'AI가 분석한 지난 주 주요 시장 이슈 요약본입니다.',
         tag: '리포트',
         // --- 이미지 수정 ---
-        imageUrl: jbj1
+        imageUrl: 'https://dummyimage.com/300x200/eee/333.png&text=Market+Report'
     },
     {
         id: 'm2',
@@ -64,12 +62,12 @@ function MainPage() {
             <Hero />
 
             <ContentScroll
-                title="AI 추천 포트폴리오"
+                title="주요 지수 현황"
                 items={recommendedPortfolios}
             />
 
             <ContentScroll
-                title="최신 마켓 인사이트"
+                title="시장 요약"
                 items={marketInsights}
             />
 
