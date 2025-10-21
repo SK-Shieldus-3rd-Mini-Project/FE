@@ -1,0 +1,21 @@
+/* src/pages/ChatPage.css (신규 - 레이아웃 CSS) */
+
+.chat-layout-container {
+    display: flex;
+    width: 100%;
+    /* Nav/Footer를 제외한 뷰포트 높이 (calc는 예시이며, 80vh 등으로 고정해도 무방) */
+    height: calc(100vh - 160px);
+    max-width: 1280px; /* 전체 최대 너비 */
+    margin: 1rem auto;
+    border: 1px solid #e0e0e0;    border-radius: 12px;
+    overflow: hidden; /* 둥근 모서리 적용 */
+    background-color: #ffffff;
+}
+
+.chat-content-area {
+    flex-grow: 1; /* 남은 공간을 모두 차지 */
+    height: 100%;
+    /* ChatWindow가 이 영역을 꽉 채우게 됩니다. */
+    display: flex;
+    flex-direction: column;
+}

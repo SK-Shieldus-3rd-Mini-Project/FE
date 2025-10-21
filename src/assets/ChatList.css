@@ -1,0 +1,50 @@
+/* src/components/ChatList.css (신규) */
+
+/* :root에서 변수를 가져오기 위해 index.css의 정의를 참고 */
+:root {
+    --theme-primary-brown: #8d6e63;
+    --theme-light-bg: #f9f9f9;
+    --theme-light-border: #e0e0e0;
+}
+
+.chat-list-sidebar {
+    width: 260px;
+    height: 100%;
+    background-color: var(--theme-light-bg);
+    border-right: 1px solid var(--theme-light-border);
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.chat-list-sidebar h3 {
+    color: var(--theme-primary-brown);
+    margin-top: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--theme-light-border);
+}
+
+.chat-session-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.chat-session-nav li a {
+    display: block;
+    padding: 0.8rem 1rem;
+    text-decoration: none;
+    color: #333;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.chat-session-nav li a:hover {
+    background-color: #f0f0f0;
+}
+
+/* NavLink가 활성화되었을 때 (현재 URL과 일치할 때) */
+.chat-session-nav li a.active {
+    background-color: var(--theme-primary-brown);
+    color: white;
+}
