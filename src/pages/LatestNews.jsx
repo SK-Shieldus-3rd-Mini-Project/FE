@@ -1,13 +1,13 @@
 // src/pages/LatestNews.jsx
 
 import React, { useState, useEffect } from 'react';
-import NewsModal from '../components/NewsModal.jsx'; // 1. 모달 다시 import
-import api from '../lib/api';
+import NewsModal from '../components/NewsModal.jsx'; // 1. 모달 컴포넌트 import
+import api from '../lib/api.js';
 import '../assets/LatestNews.css';
 
 function LatestNews() {
     const [newsList, setNewsList] = useState([]);
-    const [selectedNews, setSelectedNews] = useState(null); // 2. 모달 상태 복구
+    const [selectedNews, setSelectedNews] = useState(null); // 2. 모달 상태(state) 추가
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -25,7 +25,7 @@ function LatestNews() {
         fetchNews();
     }, []);
 
-    // 3. 모달 핸들러 복구
+    // 3. 모달 열기/닫기 핸들러 추가
     const handleOpenModal = (newsItem) => {
         setSelectedNews(newsItem);
     };
@@ -49,15 +49,17 @@ function LatestNews() {
                         </div>
                         <h3 className="news-title">{news.title}</h3>
 
-                        {/* 백엔드 NewsService가
-                          keyword 검색으로 highlight를 가져오므로 요약이 보임
+                        {/* 백엔드가
+                          Postman 응답 [User-provided JSON]에 맞춰
+                          요약본(highlight)을 summary 필드로
+                          전달합니다.
                         */}
                         <p
                             className="news-summary"
                             dangerouslySetInnerHTML={{ __html: news.summary }}
                         />
 
-                        {/* 4. <button>으로 다시 변경 */}
+                        {/* 4. <a> 태그 대신 <button>으로 변경 */}
                         <button
                             className="read-more-button"
                             onClick={() => handleOpenModal(news)}
@@ -68,7 +70,7 @@ function LatestNews() {
                 ))}
             </div>
 
-            {/* 5. 모달 컴포넌트 복구 */}
+            {/* 5. 모달 렌더링 로직 */}
             {selectedNews && (
                 <NewsModal news={selectedNews} onClose={handleCloseModal} />
             )}
