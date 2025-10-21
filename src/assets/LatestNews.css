@@ -10,6 +10,7 @@
 
 .news-container {
     width: 100%;
+    box-sizing: border-box;
     background-color: #ffffff;
     border: 1px solid var(--theme-light-border);
     padding: 2rem 3rem;
@@ -26,8 +27,8 @@
 }
 
 .news-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
 }
 
