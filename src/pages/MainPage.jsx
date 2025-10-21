@@ -5,7 +5,7 @@ import Hero from '../components/main/Hero.jsx';
 import ContentScroll from '../components/main/ContentScroll.jsx';
 import AboutSection from '../components/main/AboutSection.jsx';
 import '../assets/MainPage.css';
-import jbj1 from '../assets/images/전봉준.jpg'
+// import jbj1 from '../assets/images/전봉준.jpg'
 import jbj2 from '../assets/images/전봉준2.webp'
 
 const recommendedPortfolios = [

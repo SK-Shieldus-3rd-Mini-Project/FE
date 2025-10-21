@@ -5,6 +5,7 @@ import Nav from './components/Nav.jsx'
 import Footer from './components/Footer.jsx'
 import ChatPage from './pages/ChatPage.jsx'
 import ChatWindow from './components/ChatWindow.jsx'
+import LatestNews from "./pages/LatestNews.jsx";
 
 export default function Router() {
     return (
@@ -14,6 +15,10 @@ export default function Router() {
                 <Route
                     path='/'
                     element={<MainPage />}
+                />
+                <Route
+                    path='/news'
+                    element={<LatestNews />}
                 />
                 <Route path="/chat" element={<ChatPage />}>
                     <Route index element={<Navigate to="1" replace />} />
