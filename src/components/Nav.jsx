@@ -21,6 +21,7 @@ function Nav() {
             {/* 3. 오른쪽 링크 및 버튼 */}
             <div className="nav-section nav-right">
                 <ul className="nav-links">
+                    <li><Link to="/news">최신 뉴스</Link></li>
                     <li><Link to="/cart">장바구니</Link></li>
                     <li><Link to="/myshop">나의 상점</Link></li>
                     <li><Link to="/support">고객 광장</Link></li>
