@@ -3,6 +3,7 @@
     --theme-primary-brown: #8d6e63;
     --theme-primary-brown-darker: #795548;
     --theme-light-text: #213547;
+    --theme-light-beige-bg: #F9F6F1;
 }
 
 .hero-section {
@@ -10,11 +11,7 @@
     height: 400px;
 
     /* --- 배경 이미지 수정 --- */
-    background: linear-gradient(rgba(80, 60, 50, 0.4), rgba(80, 60, 50, 0.4)),
-    url('https://via.placeholder.com/1280x400/8d6e63/FFFFFF?text=JeonBongJun+AI+Banner');
-    background-size: cover;
-    background-position: center;
-
+    background-color: var(--theme-light-beige-bg);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -30,9 +27,13 @@
     font-size: 3.2rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    color: #ffffff;
+    color: var(--theme-light-text);
     font-family: 'Gowun Batang', 'Malgun Gothic', serif;
 }
+.hero-content p {
+  font-family: 'Gowun Batang', 'Malgun Gothic', serif;
+}
+
 /* ... */
 .hero-button {
     padding: 12px 28px;
@@ -40,6 +41,7 @@
     font-weight: bold;
     text-decoration: none;
     border-radius: 8px;
+    font-family: 'Gowun Batang', 'Malgun Gothic', serif;
     background-color: var(--theme-primary-brown);
     color: white;
     border: none;

@@ -1,21 +1,81 @@
-/* src/pages/MainPage.css (테마 수정본) */
+/* src/assets/MainPage.css (제목 위치 수정됨) */
 
 :root {
     --theme-primary-brown: #8d6e63;
-    --theme-light-bg: #f9f9f9;
+    --theme-light-beige-bg: #F9F6F1;
 }
 
+/* ... (main-page-container, dashboard-main 등 다른 부분은 동일) ... */
 .main-page-container {
     width: 100%;
-    /* index.css의 흰색 배경 대신 연한 회색 배경(#f9f9f9) 사용 */
-    background-color: var(--theme-light-bg);
-
+    background-color: var(--theme-light-beige-bg);
     display: flex;
     flex-direction: column;
+    font-family: sans-serif;
+    min-height: 100vh;
+}
 
-    /* 각 섹션(Hero, ContentScroll 등) 사이의 간격 */
-    gap: 3.5rem;
+.dashboard-main {
+    padding: 2rem;
+    flex-grow: 1;
+}
 
-    /* Footer 전까지의 하단 여백 */
-    padding-bottom: 4rem;
+.dashboard-flex-container {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    max-width: 80rem;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: 'Gowun Batang', 'Malgun Gothic', serif;
+}
+
+.dashboard-main-content,
+.dashboard-sidebar {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.dashboard-sidebar {
+    flex: 1;
+}
+
+.bottom-row-container {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.bottom-row-item {
+    flex: 1;
+}
+
+/* 개별 대시보드 카드 */
+.dashboard-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    position: relative;
+    margin-top: 2.5rem;
+}
+
+/* 대시보드 카드 제목 */
+.dashboard-card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 0.5rem; 
+}
+
+
+/* --- ▼ 모바일 화면 대응 ▼ --- */
+@media (max-width: 1023px) {
+    .dashboard-flex-container {
+        flex-direction: column;
+    }
 }

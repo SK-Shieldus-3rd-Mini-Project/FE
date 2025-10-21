@@ -23,6 +23,7 @@ function Nav() {
                 <ul className="nav-links">
                     <li><Link to="/cart">장바구니</Link></li>
                     <li><Link to="/myshop">나의 상점</Link></li>
+                    <li><Link to="/chat" >투자 상담</Link></li>
                     <li><Link to="/support">고객 광장</Link></li>
                 </ul>
                 <Link to="/register" className="nav-register-button">
