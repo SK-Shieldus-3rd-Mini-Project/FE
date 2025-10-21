@@ -8,7 +8,6 @@ function NewsModal({ news, onClose }) {
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            {/* e.stopPropagation()은 모달창 클릭 시 닫히는 것을 방지 */}
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2>{news.title}</h2>
