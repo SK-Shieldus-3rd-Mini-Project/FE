@@ -1,13 +1,13 @@
 # Dockerfile (in src/ folder)
 
 # 1. Build stage: Node.js 환경에서 React 앱 빌드
-FROM node:18-alpine as builder
+FROM node:20-alpine as builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
-COPY src .
+COPY . .
 # 환경 변수 설정 (예: 백엔드 API 주소)
-ARG VITE_API_BASE_URL=http://localhost:8080 # 기본값, 빌드 시 변경 가능
+ARG VITE_API_BASE_URL=http://localhost:8080
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN npm run build
 
