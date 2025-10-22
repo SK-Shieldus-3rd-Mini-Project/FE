@@ -1,63 +1,141 @@
-// src/components/ChatWindow.jsx (신규)
+// src/components/ChatWindow.jsx
 
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom'; // 1. useParams 훅 import
-import '../assets/ChatWindow.css'; // 2. ChatWindow 전용 CSS import
-
-// 임시 채팅 메시지 DB
-const allMessages = {
-    '1': [
-        { sender: 'AI', content: '안녕하세요! "미국 증시 및 AI 주식"에 대해 무엇이든 물어보세요.' },
-        { sender: '나', content: '최근 미국 증시 동향과 함께 AI 관련 유망 주식 3가지만 추천해줘.' },
-    ],
-    '2': [
-        { sender: 'AI', content: '포트폴리오 리밸런싱 상담입니다. 현재 자산 배분을 알려주세요.' },
-    ],
-    '3': [
-        { sender: 'AI', content: '새로운 대화를 시작합니다.' },
-    ]
-};
+import React, { useEffect, useState, useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import api from '../lib/api'; // api 임포트
+import '../assets/ChatWindow.css';
 
 function ChatWindow() {
-    // 3. URL의 :chatId 값을 가져옴 (예: /chat/1 이면 chatId는 '1')
-    const { chatId } = useParams();
+    const { chatId } = useParams(); // URL에서 chatId 가져오기
+    const [messages, setMessages] = useState([]); // 메시지 목록 상태
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [newMessage, setNewMessage] = useState(""); // 입력 메시지 상태
+    const messagesEndRef = useRef(null); // 스크롤 맨 아래로 이동하기 위한 ref
 
-    // 4. chatId에 맞는 메시지를 상태로 관리
-    const [messages, setMessages] = useState([]);
+    // 메시지 목록 가져오기 함수
+    const fetchMessages = async () => {
+        const userId = localStorage.getItem('userId');
+        if (!userId || !chatId) {
+             setError("사용자 ID 또는 채팅 ID가 없습니다.");
+             setIsLoading(false);
+             setMessages([]); // ID 없으면 빈 배열
+            return;
+        }
 
-    // 5. chatId가 변경될 때마다 해당 세션의 메시지를 불러옴
+        try {
+            setIsLoading(true);
+            const response = await api.get(`/api/users/${userId}/chat/sessions/${chatId}/messages`);
+            setMessages(response.data); // 메시지 상태 업데이트
+             setError(null);
+        } catch (err) {
+            console.error(`메시지 로딩 실패 (Chat ID: ${chatId}):`, err);
+            setError("메시지를 불러오는 중 오류가 발생했습니다.");
+             setMessages([]); // 오류 시 빈 배열
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // chatId가 변경될 때 메시지 목록 다시 로드
     useEffect(() => {
-        setMessages(allMessages[chatId] || []); // chatId에 맞는 데이터가 없으면 빈 배열
-    }, [chatId]); // chatId가 바뀔 때마다 이 effect 실행
+        fetchMessages();
+    }, [chatId]);
+
+     // 메시지 목록 맨 아래로 스크롤
+     useEffect(() => {
+         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+     }, [messages]);
 
 
-    // 6. 렌더링 (이전 ChatPage.jsx의 렌더링 내용과 동일)
+    // 메시지 전송 핸들러
+    const handleSendMessage = async (e) => {
+        e.preventDefault(); // 폼 기본 제출 방지
+        if (!newMessage.trim()) return; // 빈 메시지 방지
+
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            alert("사용자 ID가 없습니다.");
+            return;
+        }
+
+        // 낙관적 업데이트: 사용자 메시지를 즉시 화면에 추가
+         const sentMessage = {
+             messageId: Date.now(), // 임시 ID
+             sender: 'USER', // '나' 대신 'USER' 사용 (백엔드와 일치)
+             content: newMessage,
+             timestamp: new Date().toISOString(),
+             aiResponseDetail: null
+         };
+         setMessages(prevMessages => [...prevMessages, sentMessage]);
+        setNewMessage(""); // 입력창 비우기
+
+        try {
+            // 백엔드 API 호출
+            await api.post(`/api/users/${userId}/chat/sessions/${chatId}/query`, {
+                question: newMessage
+            });
+
+             // 중요: AI 응답은 비동기적으로 백엔드에서 처리됨
+             // 실제 서비스에서는 AI 응답 수신 후 메시지 목록을 업데이트해야 함
+             // (예: WebSocket, SSE 또는 주기적 폴링)
+             // 여기서는 일정 시간 후 메시지 목록을 다시 불러오는 방식으로 임시 구현
+             setTimeout(() => {
+                 fetchMessages(); // AI 응답 포함된 최신 메시지 다시 로드
+             }, 3000); // 3초 후 갱신 (실제로는 더 긴 시간 또는 다른 방식 필요)
+
+        } catch (err) {
+            console.error("메시지 전송 실패:", err);
+            alert("메시지 전송 중 오류가 발생했습니다.");
+             // 실패 시 낙관적 업데이트 롤백 (선택적)
+             setMessages(prevMessages => prevMessages.filter(msg => msg.messageId !== sentMessage.messageId));
+        }
+    };
+
+    if (isLoading) {
+        return <div className="chat-window-container"><h3>메시지 로딩 중...</h3></div>;
+    }
+
+     if (error) {
+         return <div className="chat-window-container"><h3>오류</h3><p>{error}</p></div>;
+     }
+
     return (
         <div className="chat-window-container">
-            {/* 메시지들이 표시되는 영역 */}
             <div className="message-list">
-
-                {/* 7. 상태(messages)에 따라 동적으로 렌더링 */}
-                {messages.map((msg, index) => (
-                    <div
-                        key={index}
-                        className={`message ${msg.sender === 'AI' ? 'message-bot' : 'message-user'}`}
-                    >
-                        <span className="message-sender">{msg.sender}</span>
-                        <div className="message-content">
-                            {msg.content}
-                        </div>
-                    </div>
-                ))}
-
+                {messages.length > 0 ? (
+                     messages.map((msg) => (
+                         <div
+                             // messageId를 key로 사용
+                             key={msg.messageId}
+                             // sender 값에 따라 클래스 분기 ('USER' 또는 'AI')
+                             className={`message ${msg.sender === 'AI' ? 'message-bot' : 'message-user'}`}
+                         >
+                             <span className="message-sender">{msg.sender === 'AI' ? 'AI' : '나'}</span>
+                             <div className="message-content">
+                                 {/* pre-wrap으로 줄바꿈 처리 */}
+                                 <p style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</p>
+                             </div>
+                             {/* 타임스탬프 표시 (선택적) */}
+                             {/* <span style={{fontSize: '0.7em', color: '#888', marginTop: '3px', display: 'block'}}>
+                                 {new Date(msg.timestamp).toLocaleString()}
+                             </span> */}
+                         </div>
+                     ))
+                 ) : (
+                     <p>메시지가 없습니다.</p>
+                 )}
+                 {/* 스크롤 대상 빈 div */}
+                 <div ref={messagesEndRef} />
             </div>
 
-            {/* 메시지 입력 폼 */}
-            <form className="message-input-form">
+            <form className="message-input-form" onSubmit={handleSendMessage}>
                 <input
                     type="text"
                     className="message-input"
                     placeholder="메시지를 입력하세요..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)} // 입력 값 상태 관리
                 />
                 <button type="submit" className="send-button">
                     전송
