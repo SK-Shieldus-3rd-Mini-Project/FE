@@ -5,7 +5,7 @@ FROM node:18-alpine as builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
-COPY . .
+COPY src .
 # 환경 변수 설정 (예: 백엔드 API 주소)
 ARG VITE_API_BASE_URL=http://localhost:8080 # 기본값, 빌드 시 변경 가능
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
@@ -16,7 +16,7 @@ FROM nginx:1.25-alpine
 # Nginx 기본 설정 파일 삭제
 RUN rm /etc/nginx/conf.d/default.conf
 # 직접 작성한 Nginx 설정 파일 복사 (아래 'nginx.conf' 참고)
-COPY nginx.conf /etc/nginx/conf.d/
+COPY src/nginx.conf /etc/nginx/conf.d/
 # 빌드된 React 앱 파일 복사
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
