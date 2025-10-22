@@ -6,7 +6,7 @@ import ContentScroll from '../components/main/ContentScroll.jsx';
 import AboutSection from '../components/main/AboutSection.jsx';
 import '../assets/MainPage.css';
 // import jbj1 from '../assets/images/전봉준.jpg'
-import jbj2 from '../assets/images/전봉준2.webp'
+// import jbj2 from '../assets/images/전봉준2.webp'
 
 const recommendedPortfolios = [
     {
@@ -50,7 +50,7 @@ const marketInsights = [
         description: '실시간으로 수집된 주요 경제 지표입니다.',
         tag: '지표',
         // --- 이미지 수정 ---
-        imageUrl: jbj2
+        imageUrl: 'https://dummyimage.com/300x200/eee/333.png&text=Market+Report'
     },
 ];
 
