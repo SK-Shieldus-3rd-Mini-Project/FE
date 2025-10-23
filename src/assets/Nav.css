@@ -20,13 +20,13 @@
 /* 왼쪽 섹션 (로고) */
 .nav-left {
     flex: 1; /* 공간을 차지하도록 설정 */
-    justify-content: flex-start; /* 왼쪽 정렬 */
-    gap: 20px;
+    justify-content: flex-start;
 }
 
 .nav-logo {
     font-size: 1.6rem; /* 로고 폰트 크기 */
     font-weight: bold;
+    width: 120px;
     /* 이미지와 유사한 느낌의 폰트를 우선 적용, 없으면 기본 serif */
     font-family: 'Gowun Batang', serif;
     color: #5d4037; /* 이미지의 갈색 톤 로고 색상 */
@@ -41,6 +41,7 @@
 }
 
 .search-container {
+    margin-left: 30px;
     position: relative; /* 아이콘 위치 기준 */
     width: 100%;
     max-width: 450px; /* 검색창 최대 너비 */
@@ -102,7 +103,7 @@
 
 .nav-register-button {
     padding: 10px 24px;
-    background-color: #553b2e; /* 이미지의 갈색 버튼 */
+    background-color: #493128; /* 이미지의 갈색 버튼 */
     color: white;
     text-decoration: none;
     border: none;

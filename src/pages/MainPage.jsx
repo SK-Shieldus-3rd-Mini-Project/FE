@@ -1,78 +1,73 @@
-// src/pages/MainPage.jsx (이미지 주소 수정)
+// src/pages/MainPage.jsx (최종 수정)
 
 import React from 'react';
 import Hero from '../components/main/Hero.jsx';
-import ContentScroll from '../components/main/ContentScroll.jsx';
 import AboutSection from '../components/main/AboutSection.jsx';
 import '../assets/MainPage.css';
+import IndexComponent from '../components/dashboard/IndexComponent';
+import TopGainers from '../components/dashboard/TopGainers.jsx';
+import TopLosers from '../components/dashboard/TopLosers.jsx';
+import TopVolume from '../components/dashboard/TopVolume.jsx';
 
-// 임시 데이터: AI가 분석한 전통적 투자 포트폴리오
-const recommendedPortfolios = [
-    {
-        id: 'p1',
-        title: '견실한 가치주',
-        description: 'AI가 분석한 저평가 우량주 중심 포트폴리오입니다.',
-        tag: '가치 투자',
-        // --- 이미지 수정 ---
-        imageUrl: '../assets/images/전봉준.jpg'
-    },
-    {
-        id: 'p2',
-        title: '안정형 배당주',
-        description: '지속 가능한 현금 흐름을 창출하는 배당주입니다.',
-        tag: '저위험',
-        // --- 이미지 수정 ---
-        imageUrl: '../assets/images/전봉준.jpg'
-    },
-    {
-        id: 'p3',
-        title: '국고채 중심',
-        description: '금리 변동성을 고려한 단기/장기 채권 혼합입니다.',
-        tag: '안정형',
-        // --- 이미지 수정 ---
-        imageUrl: '../assets/images/전봉준.jpg'
-    },
-];
+const MarketSummary = () => <div>시장 요약 텍스트...</div>;
+const MajorNews = () => <div>관심 종목...</div>;
+const ThematicRates = () => <div>테마별 증감률 바 차트...</div>;
 
-// 임시 데이터: 최신 마켓 인사이트
-const marketInsights = [
-    {
-        id: 'm1',
-        title: '주간 시장 동향 요약',
-        description: 'AI가 분석한 지난 주 주요 시장 이슈 요약본입니다.',
-        tag: '리포트',
-        // --- 이미지 수정 ---
-        imageUrl: '../assets/images/전봉준.jpg'
-    },
-    {
-        id: 'm2',
-        title: '오늘의 경제 지표',
-        description: '실시간으로 수집된 주요 경제 지표입니다.',
-        tag: '지표',
-        // --- 이미지 수정 ---
-        imageUrl: '../assets/images/전봉준.jpg'
-    },
-];
-
+const DashboardCard = ({ title, children }) => (
+    <div className="dashboard-card">
+        <h2 className="dashboard-card-title">{title}</h2>
+        <div>{children}</div>
+    </div>
+);
 
 function MainPage() {
     return (
         <div className="main-page-container">
-
             <Hero />
+            <main className="dashboard-main">
+                <div className="dashboard-flex-container">
+                    {/* 왼쪽 영역 */}
+                    <div className="dashboard-main-content">
+                        <div className="top-row-container">
+                            <div className="top-row-item">
+                                <DashboardCard title="코스피">
+                                    <IndexComponent symbol="kospi" />
+                                </DashboardCard>
+                            </div>
+                            <div className="top-row-item">
+                                <DashboardCard title="코스닥">
+                                    <IndexComponent symbol="kosdaq" />
+                                </DashboardCard>
+                            </div>
+                        </div>
 
-            <ContentScroll
-                title="AI 추천 포트폴리오"
-                items={recommendedPortfolios}
-            />
+                        <DashboardCard title="시장 요약">
+                            <MarketSummary />
+                        </DashboardCard>
 
-            <ContentScroll
-                title="최신 마켓 인사이트"
-                items={marketInsights}
-            />
+                        <div className="bottom-row-container">
+                            <div className="bottom-row-item">
+                                {/* 이제 이 코드는 import된 실제 컴포넌트를 올바르게 사용합니다. */}
+                                <DashboardCard title="상승률 상위"><TopGainers /></DashboardCard>
+                            </div>
+                            <div className="bottom-row-item">
+                                <DashboardCard title="하락률 상위"><TopLosers /></DashboardCard>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 오른쪽 좁은 사이드바 영역 */}
+                    <div className="dashboard-sidebar">
+                        <DashboardCard title="관심 종목"><MajorNews /></DashboardCard>
+                        <DashboardCard title="거래량 상위">
+                            <TopVolume />
+                        </DashboardCard>
+                        <DashboardCard title="테마별 증감률"><ThematicRates /></DashboardCard>
+                    </div>
+                </div>
+            </main>
 
             <AboutSection />
-
         </div>
     );
 }

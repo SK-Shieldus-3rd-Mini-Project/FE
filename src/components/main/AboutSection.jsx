@@ -10,7 +10,7 @@ function AboutSection() {
             <div className="about-image">
                 <img
                     // --- 이미지 수정 ---
-                    src="https://via.placeholder.com/500x400/f3f1ef/8d6e63?text=RAG+Technology"
+                    src="https://dummyimage.com/500x400/f3f1ef/8d6e63.png&text=RAG+Technology"
                     alt="RAG 기술 스택"
                 />
             </div>
