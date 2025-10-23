@@ -18,6 +18,12 @@ export default defineConfig({
                 target: 'http://127.0.0.1:8001',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/marketdata/, ''), // '/marketdata'를 '/api'로 변경
+            },
+            '/ai-api': {
+                target: 'http://127.0.0.1:8001',
+                changeOrigin: true,
+                // AI 서버의 엔드포인트가 '/api/ai/query'이므로, 경로 앞부분만 바꿔줍니다.
+                rewrite: (path) => path.replace(/^\/ai-api/, '/api'),
             }
         }
     }
