@@ -92,7 +92,7 @@ function Nav() {
             <div className="nav-section nav-right">
                 <ul className="nav-links">
                     <li><Link to="/news">최신 뉴스</Link></li>
-                    <li><Link to="/myshop">나의 자산</Link></li>
+                    <li><Link to="/watchlist">나의 자산</Link></li>
                     <li><Link to="/chat" >투자 상담</Link></li>
                     <li><Link to="/support">고객 광장</Link></li>
                 </ul>
