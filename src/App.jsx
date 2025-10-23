@@ -2,8 +2,10 @@
 import { useEffect } from 'react';
 import Router from './Routes.jsx';
 import api from './lib/api';
+import Nav from "./components/Nav.jsx";
+import Footer from "./components/Footer.jsx";
 
-function App() {
+export default function App() {
 
     useEffect(() => {
 
@@ -34,7 +36,9 @@ function App() {
 
     return (
         <>
+            <Nav />
             <Router />
+            <Footer />
         </>
     )
 }
