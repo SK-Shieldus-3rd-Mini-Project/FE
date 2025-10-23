@@ -6,7 +6,7 @@ function TopGainers() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch('http://127.0.0.1:8001/api/top-gainers')
+        fetch('/marketdata/top-gainers')
             .then(res => res.ok ? res.json() : Promise.reject('서버 응답 실패'))
             .then(setData)
             .catch(err => setError(err.message));
