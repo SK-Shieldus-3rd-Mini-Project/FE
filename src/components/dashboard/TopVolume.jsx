@@ -6,7 +6,7 @@ function TopVolume() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch('/marketdata/api/top-volume')
+        fetch('/ai/marketdata/top-volume')
             .then(res => res.ok ? res.json() : Promise.reject('서버 응답 실패'))
             .then(setData)
             .catch(err => setError(err.message));

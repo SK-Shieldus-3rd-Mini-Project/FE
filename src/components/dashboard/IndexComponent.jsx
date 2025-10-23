@@ -11,7 +11,7 @@ function IndexComponent({ symbol }) {
             setError(null);
             
             try {
-                const response = await fetch('/marketdata/api/indices');
+                const response = await fetch('/ai/marketdata/indices');
 
                 if (!response.ok) {
                     throw new Error('데이터 서버에서 응답을 받지 못했습니다.');

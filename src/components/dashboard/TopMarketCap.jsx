@@ -6,7 +6,7 @@ function TopMarketCap() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch('/marketdata/api/top-market-cap')
+        fetch('/ai/marketdata/top-market-cap')
             .then(res => res.ok ? res.json() : Promise.reject('서버 응답 실패'))
             .then(setData)
             .catch(err => setError(err.message));
