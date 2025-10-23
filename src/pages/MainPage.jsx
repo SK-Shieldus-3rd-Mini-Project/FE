@@ -4,14 +4,15 @@ import React from 'react';
 import Hero from '../components/main/Hero.jsx';
 import AboutSection from '../components/main/AboutSection.jsx';
 import '../assets/MainPage.css';
+
 import IndexComponent from '../components/dashboard/IndexComponent';
 import TopGainers from '../components/dashboard/TopGainers.jsx';
 import TopLosers from '../components/dashboard/TopLosers.jsx';
 import TopVolume from '../components/dashboard/TopVolume.jsx';
+import TopMarketCap from '../components/dashboard/TopMarketCap.jsx';
 
 const MarketSummary = () => <div>시장 요약 텍스트...</div>;
 const MajorNews = () => <div>관심 종목...</div>;
-const ThematicRates = () => <div>테마별 증감률 바 차트...</div>;
 
 const DashboardCard = ({ title, children }) => (
     <div className="dashboard-card">
@@ -62,7 +63,7 @@ function MainPage() {
                         <DashboardCard title="거래량 상위">
                             <TopVolume />
                         </DashboardCard>
-                        <DashboardCard title="테마별 증감률"><ThematicRates /></DashboardCard>
+                        <DashboardCard title="시가총액 상위"><TopMarketCap /></DashboardCard>
                     </div>
                 </div>
             </main>
