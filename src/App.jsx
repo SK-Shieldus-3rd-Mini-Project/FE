@@ -1,15 +1,13 @@
-
-import Router from './Routes.jsx'
 import Nav from "./components/Nav.jsx";
 import Footer from "./components/Footer.jsx";
+import AppRoutes from "./Routes.jsx";
 
-function App() {
-
+export default function App() {
   return (
     <>
-      <Router />
+      <Nav />
+      <AppRoutes />
+      <Footer />
     </>
-  )
+  );
 }
-
-export default App

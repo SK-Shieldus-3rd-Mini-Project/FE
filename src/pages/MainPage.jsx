@@ -5,8 +5,6 @@ import Hero from '../components/main/Hero.jsx';
 import ContentScroll from '../components/main/ContentScroll.jsx';
 import AboutSection from '../components/main/AboutSection.jsx';
 import '../assets/MainPage.css';
-import jbj1 from '../assets/images/전봉준.jpg'
-import jbj2 from '../assets/images/전봉준2.webp'
 
 // 임시 데이터: AI가 분석한 전통적 투자 포트폴리오
 const recommendedPortfolios = [
@@ -16,7 +14,7 @@ const recommendedPortfolios = [
         description: 'AI가 분석한 저평가 우량주 중심 포트폴리오입니다.',
         tag: '가치 투자',
         // --- 이미지 수정 ---
-        imageUrl: jbj1
+        imageUrl: '../assets/images/전봉준.jpg'
     },
     {
         id: 'p2',
@@ -24,7 +22,7 @@ const recommendedPortfolios = [
         description: '지속 가능한 현금 흐름을 창출하는 배당주입니다.',
         tag: '저위험',
         // --- 이미지 수정 ---
-        imageUrl: jbj2
+        imageUrl: '../assets/images/전봉준.jpg'
     },
     {
         id: 'p3',
@@ -32,7 +30,7 @@ const recommendedPortfolios = [
         description: '금리 변동성을 고려한 단기/장기 채권 혼합입니다.',
         tag: '안정형',
         // --- 이미지 수정 ---
-        imageUrl: jbj1
+        imageUrl: '../assets/images/전봉준.jpg'
     },
 ];
 
@@ -44,7 +42,7 @@ const marketInsights = [
         description: 'AI가 분석한 지난 주 주요 시장 이슈 요약본입니다.',
         tag: '리포트',
         // --- 이미지 수정 ---
-        imageUrl: jbj1
+        imageUrl: '../assets/images/전봉준.jpg'
     },
     {
         id: 'm2',
@@ -52,7 +50,7 @@ const marketInsights = [
         description: '실시간으로 수집된 주요 경제 지표입니다.',
         tag: '지표',
         // --- 이미지 수정 ---
-        imageUrl: jbj2
+        imageUrl: '../assets/images/전봉준.jpg'
     },
 ];
 
