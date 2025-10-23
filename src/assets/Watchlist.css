@@ -1,0 +1,210 @@
+/* src/assets/Watchlist.css */
+.wl-wrap { max-width: 1080px; margin: 32px auto; padding: 0 16px; }
+.wl-title { font-size: 22px; font-weight: 700; margin-bottom: 16px; }
+
+.wl-skel, .wl-empty { padding: 24px; text-align: center; color: #666; border: 1px dashed #ddd; border-radius: 10px; }
+
+.wl-table { width: 100%; border: 1px solid #eee; border-radius: 12px; overflow: hidden; }
+.wl-row { display: grid; grid-template-columns: 1.5fr 1fr 0.7fr 0.8fr; gap: 12px; padding: 14px 16px; border-top: 1px solid #f3f3f3; }
+.wl-row:first-child { border-top: none; }
+.wl-head { background: #fafafa; font-weight: 600; }
+
+.c-name { display: flex; align-items: center; gap: 10px; }
+.wl-link { color: #222; text-decoration: none; font-weight: 600; }
+.wl-link:hover { text-decoration: underline; }
+
+.wl-ticker { font-size: 12px; color: #888; padding: 2px 6px; border: 1px solid #eee; border-radius: 6px; }
+
+.c-price { text-align: right; }
+.c-change { text-align: right; font-weight: 700; }
+.c-change.up { color: #d33; }
+.c-change.down { color: #1b7a1b; }
+
+.c-actions { text-align: right; }
+.wl-btn { padding: 6px 10px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; }
+.wl-btn:hover { background: #f7f7f7; }
+
+.wl-seal { display: inline-block; padding: 2px 6px; border: 1px solid #caa; border-radius: 6px; color: #b33; font-weight: 700; }
+.wl-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.wl-tab {
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.2s;
+}
+.wl-tab.active {
+  background: #5c4636;
+  color: #fff;
+  border-color: #5c4636;
+}
+.wl-tab:hover {
+  background: #eee;
+}
+/* 페이지 레이아웃 */
+.wl-page {
+  padding: 24px 20px 80px;
+  background: #faf7f4; /* 아이보리 느낌 */
+  min-height: calc(100vh - 64px);
+}
+
+.wl-header {
+  max-width: 1080px;
+  margin: 0 auto 16px;
+}
+
+.wl-h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #2f251e;
+  margin: 0 0 12px;
+}
+
+/* ── 탭바 (피그마 스타일) ────────────────────────────── */
+.wl-tabbar {
+  position: relative;
+  display: inline-flex;
+  gap: 8px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #eee4da;
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(44, 34, 24, 0.06);
+}
+
+.wl-pill {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 700;
+  color: #6f6258;
+  transition: all .2s;
+}
+.wl-pill:hover { background: #f4efea; }
+.wl-pill.active { color: #fff; background: #5c4636; }
+
+/* 언더라인 인디케이터 (선택 시 아래에서 슥~) */
+.wl-underline {
+  position: absolute;
+  left: 6px;
+  right: calc(50% + 6px);
+  bottom: -2px;
+  height: 3px;
+  background: #5c4636;
+  border-radius: 999px;
+  transition: all .25s cubic-bezier(.4,.0,.2,1);
+}
+.wl-underline.watch { left: calc(50% + 6px); right: 6px; }
+
+/* ── 카드 컨테이너 ───────────────────────────────────── */
+.wl-card {
+  max-width: 1080px;
+  margin: 16px auto 0;
+  background: #fff;
+  border: 1px solid #eee4da;
+  border-radius: 14px;
+  box-shadow: 0 12px 28px rgba(44, 34, 24, 0.08);
+  overflow: hidden;
+}
+
+/* 테이블 헤더/로우 공통 */
+.wl-row {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr .9fr 1fr .9fr; /* 기본(관심) */
+  gap: 12px;
+  align-items: center;
+  padding: 14px 18px;
+  border-top: 1px solid #f1e9e0;
+}
+.wl-row:first-child { border-top: 0; }
+
+.wl-head {
+  background: #fbf8f5;
+  font-weight: 800;
+  color: #6b5b51;
+}
+
+/* 보유 탭: 수량 칼럼 추가 → 그리드 재정의 */
+.wl-card:has(.wl-row .c-qty) .wl-row {
+  grid-template-columns: 2fr 1.2fr .9fr 1fr; /* name price qty change */
+}
+
+/* 컬럼 공통 */
+.c-name { display:flex; align-items:center; gap:8px; }
+.c-price, .c-qty, .c-change, .c-actions {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 링크/티커 */
+.wl-link {
+  font-weight: 800;
+  color: #2f251e;
+  text-decoration: none;
+}
+.wl-link:hover { text-decoration: underline; }
+.wl-ticker {
+  margin-left: 6px;
+  font-size: 12px;
+  color: #9b8f86;
+}
+
+/* 상승/하락 */
+.c-change.up   { color: #d23232; font-weight: 800; }
+.c-change.down { color: #1976d2; font-weight: 800; }
+
+/* 버튼 */
+.wl-btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #e8ded5;
+  background: #fff;
+  color: #5a4a3f;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+}
+.wl-btn:hover { background: #f6f1ec; }
+.wl-btn.ghost {
+  background: transparent;
+  border-color: #e8ded5;
+}
+
+/* 로딩 / 비어있음 */
+.wl-skel, .wl-empty {
+  padding: 60px 28px;
+  text-align: center;
+  color: #7a6d63;
+}
+.wl-seal {
+  display: inline-block;
+  padding: 2px 6px;
+  border: 1px solid #e1d7cd;
+  border-radius: 6px;
+  background: #fbf8f5;
+  font-weight: 800;
+  letter-spacing: .15em;
+}
+
+/* 반응형 */
+@media (max-width: 720px) {
+  .wl-row { grid-template-columns: 1.6fr 1fr .8fr; }
+  .wl-row .c-actions { display: none; }
+  .wl-card:has(.wl-row .c-qty) .wl-row { grid-template-columns: 1.6fr 1fr .8fr; }
+}
+.wl-btn.danger {
+  color: #b91c1c;
+  border-color: #f1c4c4;
+}
+.wl-btn.danger:hover {
+  background: #fce9e9;
+}

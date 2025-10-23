@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../lib/api'; // api 임포트
+import axios from "axios";
 import '../assets/ChatWindow.css';
 
 function ChatWindow() {
@@ -71,24 +72,28 @@ function ChatWindow() {
         setNewMessage(""); // 입력창 비우기
 
         try {
-            // 백엔드 API 호출
-            await api.post(`/api/users/${userId}/chat/sessions/${chatId}/query`, {
+            const aiResponse = await axios.post(`/ai-api/ai/query`, {
+                session_id: chatId, // AI 서버는 session_id를 받습니다
                 question: newMessage
-            });
+            }, { withCredentials: true }); // 필요하다면 쿠키 전송 옵션 추가
 
-             // 중요: AI 응답은 비동기적으로 백엔드에서 처리됨
-             // 실제 서비스에서는 AI 응답 수신 후 메시지 목록을 업데이트해야 함
-             // (예: WebSocket, SSE 또는 주기적 폴링)
-             // 여기서는 일정 시간 후 메시지 목록을 다시 불러오는 방식으로 임시 구현
-             setTimeout(() => {
-                 fetchMessages(); // AI 응답 포함된 최신 메시지 다시 로드
-             }, 3000); // 3초 후 갱신 (실제로는 더 긴 시간 또는 다른 방식 필요)
+            const receivedAiMessage = {
+                messageId: `ai-${Date.now()}`, // 임시 ID
+                sender: 'AI',
+                content: aiResponse.data.answer, // AI 서버 응답의 answer 필드 사용
+                timestamp: aiResponse.data.timestamp,
+                aiResponseDetail: { // 필요 시 AI 응답의 추가 정보 저장
+                    category: aiResponse.data.category,
+                    sources: aiResponse.data.sources
+                }
+            };
+            setMessages(prevMessages => [...prevMessages, receivedAiMessage]);
+
 
         } catch (err) {
-            console.error("메시지 전송 실패:", err);
+            console.error("메시지 전송 또는 AI 응답 처리 실패:", err);
             alert("메시지 전송 중 오류가 발생했습니다.");
-             // 실패 시 낙관적 업데이트 롤백 (선택적)
-             setMessages(prevMessages => prevMessages.filter(msg => msg.messageId !== sentMessage.messageId));
+            setMessages(prevMessages => prevMessages.filter(msg => msg.messageId !== sentMessage.messageId));
         }
     };
 
