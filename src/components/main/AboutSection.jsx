@@ -1,10 +1,12 @@
 // src/components/main/AboutSection.jsx (이미지 주소 수정)
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // useNavigate 훅을 임포트
+import { handleStartChat } from '../../utils/chatUtils'; // 공통 함수 임포트
 import '../../assets/AboutSection.css';
 
 function AboutSection() {
+    const navigate = useNavigate(); // navigate 함수를 사용하여 페이지 이동
+
     return (
         <section className="about-section">
             <div className="about-image">
@@ -22,9 +24,9 @@ function AboutSection() {
                     방대한 실시간 시장 데이터를 검색하고 분석하여
                     가장 정확하고 맥락에 맞는 투자 조언을 생성합니다.
                 </p>
-                <Link to="/chat" className="about-button">
+                <button onClick={() => handleStartChat(navigate)} className="about-button">
                     AI 분석 경험하기
-                </Link>
+                </button>
             </div>
         </section>
     );

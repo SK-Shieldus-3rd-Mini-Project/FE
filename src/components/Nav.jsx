@@ -1,8 +1,11 @@
+// src/components/Nav.jsx
+
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import '../assets/Nav.css'; // Nav.css 파일 import
 import useDebounce from '../components/hooks/useDebounce'; // 디바운스 훅
 import { searchStocksByQuery } from '../lib/api'; // API 호출 함수
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { handleStartChat, handleGoToLatestChat } from '../utils/chatUtils';
 
 function Nav() {
     const [query, setQuery] = useState(''); // 검색어
@@ -10,6 +13,8 @@ function Nav() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // 드롭다운 상태
 
     const navigate = useNavigate();
+    const location = useLocation();
+
     const searchContainerRef = useRef(null); // 검색창+드롭다운 영역 참조
 
     const debouncedQuery = useDebounce(query, 300);
@@ -56,6 +61,24 @@ function Nav() {
         };
     }, [searchContainerRef]);
 
+    const handleInvestConsultation = (e) => {
+        // 🚨 <Link>의 기본 동작인 동기적 페이지 이동을 막음(비동기 navigate를 보장)
+        e.preventDefault();
+
+        // 현재 URL이 "/chat"으로 시작하는지 확인 (채팅방 내부에 있는지 확인)
+        // 예: /chat/12345 -> true, /news -> false
+        const isInChat = location.pathname.startsWith('/chat');
+
+        if (isInChat) {
+            // 🟢 채팅방 내부에 있다면: 가장 최신 채팅방으로 이동만 함
+            // (새 채팅방을 생성하지 않음)
+            handleGoToLatestChat(navigate);
+        } else {
+            // 🟢 메인 페이지 등 외부에 있다면: 새 채팅방을 생성
+            handleStartChat(navigate);
+        }
+    };
+
     return (
         <nav className="navbar">
             <div className="nav-section nav-left">
@@ -92,8 +115,8 @@ function Nav() {
             <div className="nav-section nav-right">
                 <ul className="nav-links">
                     <li><Link to="/news">최신 뉴스</Link></li>
-                    <li><Link to="/watchlist">나의 자산</Link></li>
-                    <li><Link to="/chat" >투자 상담</Link></li>
+                    <li><Link to="/myshop">나의 자산</Link></li>
+                    <li><Link to="/chat" onClick={handleInvestConsultation}>투자 상담</Link></li>
                     <li><Link to="/support">고객 광장</Link></li>
                 </ul>
                 <Link to="/register" className="nav-register-button">

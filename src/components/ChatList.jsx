@@ -1,17 +1,29 @@
-// src/components/ChatList.jsx (수정)
+// src/components/ChatList.jsx
 
 import React, { useState, useEffect } from 'react';
-// 1. NavLink 외에 useNavigate 훅을 임포트합니다.
 import { NavLink, useNavigate } from 'react-router-dom';
 import api from '../lib/api';
 import '../assets/ChatList.css';
+
+// 💡 sessionId를 기준으로 최신 순(내림차순) 정렬 함수
+const sortSessionsById = (sessions) => {
+    // .slice()를 사용하여 원본 배열 복사 후 정렬
+    return sessions.slice().sort((a, b) => { 
+        // sessionId를 숫자로 변환(문자열이나 유효하지 않은 값은 0으로 처리)
+        const idA = parseInt(a.sessionId, 10) || 0;
+        const idB = parseInt(b.sessionId, 10) || 0;
+        
+        // 내림차순 정렬: ID가 큰 값(B)이 앞으로 오도록 함 (최신 순)
+        return idB - idA; 
+    });
+};
 
 function ChatList() {
     const [chatSessions, setChatSessions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     
-    // 2. navigate 함수를 사용할 수 있도록 선언합니다.
+    // 2. navigate 함수를 사용할 수 있도록 선언
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,7 +38,11 @@ function ChatList() {
             try {
                 setIsLoading(true);
                 const response = await api.get(`/api/users/${userId}/chat/sessions`);
-                setChatSessions(response.data);
+
+                // 💡 응답 데이터를 ID 기준으로 최신 순으로 정렬
+                const sortedSessions = sortSessionsById(response.data);
+                setChatSessions(sortedSessions);
+
                 setError(null);
             } catch (err) {
                 console.error("채팅 목록 로딩 실패:", err);
@@ -40,7 +56,7 @@ function ChatList() {
         fetchChatSessions();
     }, []); // 컴포넌트 마운트 시 1회 실행
 
-    // 새 채팅 시작 함수 (수정됨)
+    // 새 채팅 시작 함수 
     const handleNewChat = async () => {
         const userId = localStorage.getItem('userId');
         if (!userId) {
@@ -51,24 +67,19 @@ function ChatList() {
         
         if (title) {
             try {
-                // 3. 백엔드에 새 세션 생성을 요청합니다.
+                // 3. 백엔드에 새 세션 생성 요청
                 const response = await api.post(`/api/users/${userId}/chat/sessions`, { title });
-                // 4. 응답으로 받은 새 세션 ID를 변수에 저장합니다.
+
+                // 4. 응답으로 받은 새 세션 ID를 변수에 저장
                 const newSessionId = response.data;
 
-                // 5. (선택적) 목록 상태를 즉시 업데이트하여 새 채팅방을 목록 상단에 추가합니다.
-                // 이렇게 하면 목록 새로고침 API를 다시 호출할 필요가 없습니다.
+                // 5. 목록 상태를 즉시 업데이트하여 새 채팅방을 목록 상단에 추가
                 const newSession = { sessionId: newSessionId, title: title };
                 setChatSessions(prevSessions => [newSession, ...prevSessions]);
 
-                // 6. ★ 방금 만든 새 채팅방으로 즉시 이동시킵니다. ★
-                // 이렇게 newSessionId를 사용함으로써 ESlint 오류가 해결됩니다.
+                // 6. ★ 방금 만든 새 채팅방으로 즉시 이동 ★
                 navigate(`/chat/${newSessionId}`);
 
-                /* // 이전 코드 (목록만 새로고침 - newSessionId를 사용 안 함)
-                const sessionsResponse = await api.get(`/api/users/${userId}/chat/sessions`);
-                setChatSessions(sessionsResponse.data);
-                */
             } catch (err) {
                 console.error("새 채팅 시작 실패:", err);
                 alert("새 채팅방 생성 중 오류가 발생했습니다.");
@@ -113,3 +124,4 @@ function ChatList() {
 }
 
 export default ChatList;
+
