@@ -41,7 +41,7 @@ function Nav() {
     }, [debouncedQuery]);
 
     // 검색 결과 항목 클릭 시
-    const handleResultClick = (stockId) => { // 1. stockCode -> stockId
+    const handleResultClick = (stockId) => {
         navigate(`/stock/${stockId}`); // 상세 페이지로 이동
         setQuery('');
         setResults([]);
@@ -99,7 +99,7 @@ function Nav() {
                         <ul className="search-results-dropdown">
                             {results.map((stock) => (
                                 <li
-                                    // 2. stockCode -> stockId
+                                    // Stock 엔티티의 stockId, stockName 사용
                                     key={stock.stockId}
                                     onClick={() => handleResultClick(stock.stockId)}
                                 >
@@ -111,7 +111,6 @@ function Nav() {
                 </div>
             </div>
 
-            {/* (오른쪽 링크 부분은 동일) ... */}
             <div className="nav-section nav-right">
                 <ul className="nav-links">
                     <li><Link to="/news">최신 뉴스</Link></li>
