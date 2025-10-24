@@ -1,19 +1,9 @@
-import React, { useState, useEffect } from 'react';
-// StockListItem import를 제거합니다.
+import React from 'react'; 
 
-function TopMarketCap() {
-    const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        fetch('/marketdata/api/top-market-cap')
-            .then(res => res.ok ? res.json() : Promise.reject('서버 응답 실패'))
-            .then(setData)
-            .catch(err => setError(err.message));
-    }, []);
-
-    if (error) return <p style={{ color: 'red' }}>오류: {error}</p>;
-    if (!Array.isArray(data)) return <p>데이터 로딩 중...</p>;
+function TopMarketCap({ data }) {
+    if (!Array.isArray(data)) {
+        return <p>데이터를 기다리는 중...</p>;
+    }
     
     return (
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
@@ -24,7 +14,6 @@ function TopMarketCap() {
                 const sign = isPositive ? '+' : '';
 
                 return (
-                    // ▼▼▼ 여기가 핵심! 목록 아이템을 직접 렌더링합니다. ▼▼▼
                     <li key={stock.code} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', fontSize: '0.95em' }}>
                         {/* 왼쪽: 순위와 종목명 */}
                         <div style={{ display: 'flex', alignItems: 'center' }}>

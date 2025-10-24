@@ -1,6 +1,6 @@
 // src/pages/MainPage.jsx (최종 수정)
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Hero from '../components/main/Hero.jsx';
 import AboutSection from '../components/main/AboutSection.jsx';
 import '../assets/MainPage.css';
@@ -22,52 +22,69 @@ const DashboardCard = ({ title, children }) => (
 );
 
 function MainPage() {
+    const [dashboardData, setDashboardData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        fetch('http://127.0.0.1:8001/api/dashboard')
+            .then(res => {
+                if (!res.ok) throw new Error('대시보드 데이터를 가져오는데 실패했습니다.');
+                return res.json();
+            })
+            .then(data => {
+                setDashboardData(data); 
+            })
+            .catch(err => {
+                setError(err.message);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, []); 
+
+    if (loading) return <div className="loading-screen">전체 대시보드 데이터를 불러오는 중...</div>;
+    if (error) return <div className="error-screen" style={{color: 'red', padding: '20px'}}>오류: {error}</div>;
+
     return (
         <div className="main-page-container">
             <Hero />
             <main className="dashboard-main">
                 <div className="dashboard-flex-container">
-                    {/* 왼쪽 영역 */}
                     <div className="dashboard-main-content">
                         <div className="top-row-container">
                             <div className="top-row-item">
                                 <DashboardCard title="코스피">
-                                    <IndexComponent symbol="kospi" />
+                                    {/* ▼▼▼ 여기가 핵심! 받아온 데이터를 props로 내려줍니다. ▼▼▼ */}
+                                    <IndexComponent data={dashboardData?.indices?.kospi} />
                                 </DashboardCard>
                             </div>
                             <div className="top-row-item">
                                 <DashboardCard title="코스닥">
-                                    <IndexComponent symbol="kosdaq" />
+                                    <IndexComponent data={dashboardData?.indices?.kosdaq} />
                                 </DashboardCard>
                             </div>
                         </div>
 
-                        <DashboardCard title="시장 요약">
-                            <MarketSummary />
-                        </DashboardCard>
+                        <DashboardCard title="시장 요약"><MarketSummary /></DashboardCard>
 
                         <div className="bottom-row-container">
                             <div className="bottom-row-item">
-                                {/* 이제 이 코드는 import된 실제 컴포넌트를 올바르게 사용합니다. */}
-                                <DashboardCard title="상승률 상위"><TopGainers /></DashboardCard>
+                                <DashboardCard title="상승률 상위"><TopGainers data={dashboardData?.topGainers} /></DashboardCard>
                             </div>
                             <div className="bottom-row-item">
-                                <DashboardCard title="하락률 상위"><TopLosers /></DashboardCard>
+                                <DashboardCard title="하락률 상위"><TopLosers data={dashboardData?.topLosers} /></DashboardCard>
                             </div>
                         </div>
                     </div>
 
-                    {/* 오른쪽 좁은 사이드바 영역 */}
                     <div className="dashboard-sidebar">
                         <DashboardCard title="관심 종목"><MajorNews /></DashboardCard>
-                        <DashboardCard title="거래량 상위">
-                            <TopVolume />
-                        </DashboardCard>
-                        <DashboardCard title="시가총액 상위"><TopMarketCap /></DashboardCard>
+                        <DashboardCard title="거래량 상위"><TopVolume data={dashboardData?.topVolume} /></DashboardCard>
+                        <DashboardCard title="시가총액 상위"><TopMarketCap data={dashboardData?.topMarketCap} /></DashboardCard>
                     </div>
                 </div>
             </main>
-
             <AboutSection />
         </div>
     );

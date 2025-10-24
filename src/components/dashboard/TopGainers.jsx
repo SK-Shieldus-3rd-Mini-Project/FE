@@ -1,18 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
-function TopGainers() {
-    const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        fetch('/marketdata/api/top-gainers')
-            .then(res => res.ok ? res.json() : Promise.reject('서버 응답 실패'))
-            .then(setData)
-            .catch(err => setError(err.message));
-    }, []);
-
-    if (error) return <p style={{ color: 'red' }}>오류: {error}</p>;
-    if (!Array.isArray(data)) return <p>데이터 로딩 중...</p>;
+function TopGainers({ data }) {
+    if (!Array.isArray(data)) {
+        return <p>데이터를 기다리는 중...</p>;
+    }
     
     return (
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>

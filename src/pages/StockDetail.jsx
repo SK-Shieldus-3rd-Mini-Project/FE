@@ -38,73 +38,65 @@ function Sparkline({points = [], height = 180}) {
 }
 
 export default function StockDetail() {
-  const { id } = useParams();          // 예: 삼성전자라면 /stock/005930 처럼
-  const [data, setData] = useState(null);
-  const [watch, setWatch] = useState(false);
-  const [loading, setLoading] = useState(true);
+    const { id } = useParams();
+    const [data, setData] = useState(null);
+    const [watch, setWatch] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  // 관심등록 localStorage 키
-  const watchKey = `watch:${id}`;
+    const watchKey = `watch:${id}`;
 
-  useEffect(() => {
-    setWatch(localStorage.getItem(watchKey) === "1");
-  }, [watchKey]);
+    useEffect(() => {
+        setWatch(localStorage.getItem(watchKey) === "1");
+    }, [watchKey]);
 
-  useEffect(() => {
-    let alive = true;
+    useEffect(() => {
+        const fetchAll = async () => {
+            setError(null);
+            try {
+                // 1. 주식 상세 정보와 차트 데이터를 동시에 호출합니다.
+                const [detailRes, chartRes] = await Promise.all([
+                    fetch(`http://127.0.0.1:8001/api/stock/${id}`),
+                    fetch(`http://127.0.0.1:8001/api/stock/${id}/chart`)
+                ]);
 
-    async function fetchAll() {
-      setLoading(true);
-      try {
-        // ---- 백엔드 연결 시 여기만 바꾸면 됨 ----
-        // const [detailRes, newsRes, rptRes] = await Promise.all([
-        //   fetch(`/api/stocks/${id}`),
-        //   fetch(`/api/stocks/${id}/news`),
-        //   fetch(`/api/stocks/${id}/reports`)
-        // ]);
-        // const detail = await detailRes.json();
-        // const news = await newsRes.json();
-        // const reports = await rptRes.json();
-        // -----------------------------------------
+                if (!detailRes.ok || !chartRes.ok) {
+                    throw new Error('종목 정보를 가져오는 데 실패했습니다.');
+                }
 
-        // 임시 목데이터 (요청 실패 시에도 UI 확인 가능)
-        const detail = {
-          name: "삼성전자",
-          ticker: "005930",
-          foreignTicker: "SSNLF",
-          price: 92351,
-          changePct: 3.51,
-          changeAmt: 1820,
-          ohlc: { open: 92351, low: 92351, high: 92351 },
-          tech: { rsi: 32, macd: 92351, ma20: 92351 },
-          chart: [90, 100, 92, 110, 104, 98, 88, 95, 120, 84, 96, 112, 101, 108, 115, 104, 111],
-          comment: "현재 전쟁가 구간이며, AI 반도체 수요로 중장기 성장 전망 긍정적이에요.",
-          news: [
-            "삼성전자, 삼성카 새 모니 주식 차분에 1%대 약세",
-            "삼성전자 수출입, '메모리·AI' 호조에 급증…외인 매수 확대",
-            "“와! 곧 OLED는 어때요”… 삼성전자, TV 하이엔드 공략"
-          ],
-          reports: [
-            { broker: "NH투자증권", target: "95,000원", stance: "매수" },
-            { broker: "한국투자증권", target: "90,000원", stance: "매수" },
-          ],
+                const detail = await detailRes.json();
+                const chart = await chartRes.json();
+
+                // 2. 모든 데이터를 하나로 합쳐서 state에 저장합니다.
+                setData({
+                    ...detail,
+                    ...chart,
+                    // ▼▼▼ 여기가 핵심! AI 코멘트를 다시 임시 목데이터로 변경 ▼▼▼
+                    comment: "현재 저평가 구간이며, AI 반도체 수요로 중장기 성장 전망이 긍정적입니다.",
+                    // 뉴스, 리포트도 임시 데이터를 유지합니다.
+                    news: [ `${detail.name}, 새로운 모멘텀 발견`, `외국인, ${detail.name} 순매수 지속`, ],
+                    reports: [ { broker: "NH투자증권", target: "95,000원", stance: "매수" }, ],
+                    // 기술적 지표도 임시값을 사용합니다.
+                    tech: { rsi: 32, macd: 92351, ma20: 92351 },
+                });
+
+            } catch (e) {
+                console.error(e);
+                setError("데이터를 불러오지 못했어요.");
+            } finally {
+                if (loading) setLoading(false);
+            }
         };
 
-        if (!alive) return;
-        setData(detail);
-      } catch (e) {
-        if (!alive) return;
-        console.error(e);
-        // 실패 시에도 목데이터로 대체하고 계속 진행
-        setData(null);
-      } finally {
-        if (alive) setLoading(false);
-      }
-    }
+        // 페이지에 처음 들어왔을 때 한 번 즉시 실행
+        fetchAll();
 
-    fetchAll();
-    return () => { alive = false; };
-  }, [id]);
+        // 5초마다 데이터 자동 새로고침 (폴링)
+        const intervalId = setInterval(fetchAll, 5000);
+
+        // 페이지를 떠나면 반복을 멈춤
+        return () => clearInterval(intervalId);
+    }, [id]);
 
   const toggleWatch = () => {
     const next = !watch;
@@ -116,8 +108,8 @@ export default function StockDetail() {
     return <div className="sd-wrap"><div className="sd-skel">불러오는 중…</div></div>;
   }
 
-  if (!data) {
-    return <div className="sd-wrap"><div className="sd-error">데이터를 불러오지 못했어요.</div></div>;
+  if (error || !data) {
+        return <div className="sd-wrap"><div className="sd-error">{error || '데이터를 불러오지 못했어요.'}</div></div>;
   }
 
   const {
