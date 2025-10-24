@@ -1,21 +1,39 @@
-/* src/pages/ChatPage.css (신규 - 레이아웃 CSS) */
+/* src/assets/ChatPage.css */
+
+:root {
+    --sidebar-width: 260px;
+    --nav-height: 80px;
+}
 
 .chat-layout-container {
+    position: relative;
     display: flex;
     width: 100%;
-    /* Nav/Footer를 제외한 뷰포트 높이 (calc는 예시이며, 80vh 등으로 고정해도 무방) */
-    height: calc(100vh - 160px);
-    max-width: 1280px; /* 전체 최대 너비 */
+    max-width: 1280px;
+    height: calc(100vh - var(--nav-height) - 2rem); /* 🔥 네비 제외 */
     margin: 1rem auto;
-    border: 1px solid #e0e0e0;    border-radius: 12px;
-    overflow: hidden; /* 둥근 모서리 적용 */
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
     background-color: #ffffff;
+    transition: transform 0.3s ease; 
 }
 
-.chat-content-area {
-    flex-grow: 1; /* 남은 공간을 모두 차지 */
-    height: 100%;
-    /* ChatWindow가 이 영역을 꽉 채우게 됩니다. */
+/* 🔥 사이드바 열렸을 때 컨테이너 전체가 이동 */
+.chat-layout-container.shifted {
+    margin-left: calc(var(--sidebar-width) + 1rem);
+    width: calc(100% - var(--sidebar-width));
+    max-width: calc(1280px - var(--sidebar-width));
+}
+
+/* 메인 콘텐츠 */
+.main-content {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    padding: 20px 20px 20px 20px; /* 🔥 상단 여백 (햄버거 버튼 공간) */
+    box-sizing: border-box;
+    overflow-y: auto;
 }
+

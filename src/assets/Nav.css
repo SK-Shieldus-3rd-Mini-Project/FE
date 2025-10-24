@@ -9,6 +9,7 @@
     background-color: #ffffff; /* 흰색 배경 */
     width: 100%;
     box-sizing: border-box; /* 패딩이 너비에 영향을 주지 않도록 설정 */
+    transition: transform 0.3s ease;
 }
 
 /* 모든 섹션에 공통 적용 */

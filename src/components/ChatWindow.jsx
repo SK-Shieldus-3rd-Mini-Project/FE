@@ -5,6 +5,30 @@ import { useParams } from 'react-router-dom';
 import api from '../lib/api'; // api 임포트
 import '../assets/ChatWindow.css';
 
+// ⭐️⭐️⭐️ 1. 전체 추천 질문 목록 정의 (함수 외부에 위치) ⭐️⭐️⭐️
+const ALL_SUGGESTIONS = [
+    // 기존 질문
+    '**삼성전자**의 최근 5년 주가 흐름 분석해 줘.',
+    '**가치 투자**와 **성장 투자**의 차이점을 설명해 줘.',
+    '금리 인상 시기에 유망한 **섹터**는 어디야?',
+    
+    // 추가 질문 예시
+    '**기술적 분석**에서 **MACD** 지표를 어떻게 활용해야 해?',
+    '지금 **원/달러 환율**이 주식 시장에 미치는 영향은?',
+    '내 포트폴리오의 **베타** 값을 계산해 줘.',
+    '**ROE**와 **PBR** 지표를 활용한 종목 추천 기준은?',
+    '**공매도**가 주가에 미치는 단기적, 장기적 영향은?',
+    '다가오는 실적 시즌에 주목해야 할 **종목 3가지** 알려줘.',
+];
+
+// 배열에서 무작위로 N개의 요소를 선택하는 함수
+const getRandomSuggestions = (arr, num) => {
+    // 배열 복사 후 셔플
+    const shuffled = arr.slice().sort(() => 0.5 - Math.random());
+    // 앞에서부터 N개 반환
+    return shuffled.slice(0, num);
+};
+
 function ChatWindow() {
     const { chatId } = useParams();
     const [messages, setMessages] = useState([]);
@@ -16,6 +40,22 @@ function ChatWindow() {
     const [error, setError] = useState(null);
     const [newMessage, setNewMessage] = useState("");
     const messagesEndRef = useRef(null);
+    const messageListRef = useRef(null); // 메시지 리스트 컨테이너 ref 정의
+
+    // ⭐️⭐️⭐️ 2. 추천 질문을 저장할 state 추가 ⭐️⭐️⭐️
+    const [currentSuggestions, setCurrentSuggestions] = useState([]);
+
+    // ⭐️⭐️⭐️ 이 함수를 추가합니다 ⭐️⭐️⭐️
+    const handleClickSuggestion = (question) => {
+        // ** bold 마크다운을 제거하고 실제 텍스트만 추출합니다.
+        const plainQuestion = question.replace(/\*\*/g, ''); 
+        
+        // 1. 입력창에 텍스트를 채워 넣습니다.
+        setNewMessage(plainQuestion);
+
+        // 2. (선택 사항) 만약 클릭 즉시 전송을 원한다면, 아래 코드를 사용합니다.
+        //     handleSendMessage(null, plainQuestion); 
+    };
 
     // 메시지 목록 가져오기 함수
     const fetchMessages = async () => {
@@ -46,9 +86,20 @@ function ChatWindow() {
         fetchMessages();
     }, [chatId]);
 
+    // 🔥 수정: 메시지 리스트 컨테이너 내부에서만 스크롤
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (messageListRef.current && messagesEndRef.current) {
+            // scrollIntoView 대신 컨테이너의 scrollTop 직접 조작
+            messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+        }
     }, [messages]);
+
+    // ⭐️⭐️⭐️ 3. 컴포넌트 로드 시, 랜덤 질문을 설정하는 useEffect 추가 ⭐️⭐️⭐️
+    useEffect(() => {
+        // 컴포넌트가 마운트될 때 (또는 chatId가 바뀔 때) 랜덤 질문 3개를 설정
+        const randomQuestions = getRandomSuggestions(ALL_SUGGESTIONS, 3);
+        setCurrentSuggestions(randomQuestions);
+    }, [chatId]); // 채팅방이 바뀔 때마다 질문을 새로고침할 수 있도록 chatId 의존성 추가
 
     // 🟢 메시지 전송 및 AI 응답 처리 함수 (폴링 적용)
     const handleSendMessage = async (e) => {
@@ -142,9 +193,16 @@ function ChatWindow() {
     }
 
 
+    // src/components/ChatWindow.jsx (ChatWindow 함수 내부)
+
+    // ... (생략: 기존 fetchMessages, useEffect, handleSendMessage 등) ...
+
+    // ... (생략: 기존 isLoading, error 체크 if문) ...
+
+
     return (
         <div className="chat-window-container">
-            <div className="message-list">
+            <div className="message-list" ref={messageListRef}>
                 {messages.length > 0 ? (
                     messages.map((msg) => (
                         <div
@@ -156,22 +214,35 @@ function ChatWindow() {
 
                                 {msg.isPending && msg.sender === 'AI' ? (
                                     <>
-                                        {/* 로딩 애니메이션 (CSS의 .dot-typing 필요) */}
+                                        {/* 로딩 애니메이션 */}
                                         <div className="pending-indicator">
                                             <div className="dot-typing"></div>
                                         </div>
-                                        {/* 🟢 로딩 텍스트를 메시지 내용으로 직접 표시 */}
                                         <p style={{ margin: 0, padding: 0 }}>AI가 응답을 생성하는 중입니다...</p>
                                     </>
                                 ) : (
-                                    // 🟢 로딩 중이 아닐 때만 실제 메시지 내용 표시
                                     <p style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</p>
                                 )}
                             </div>
                         </div>
                     ))
                 ) : (
-                    <p>메시지가 없습니다.</p>
+                    <div className="empty-chat-state">
+                        <span className="welcome-icon">👋</span> 
+                        <h3>무엇을 분석해 드릴까요?</h3>
+                        <p>궁금한 종목이나 투자 전략을 입력해 주시면 AI가 분석해 드립니다.</p>
+                        <ul className="suggestion-list">
+                            {/* 💡 currentSuggestions state를 맵핑하여 3개의 랜덤 질문 표시 */}
+                            {currentSuggestions.map((question, index) => (
+                                <li 
+                                    key={index}
+                                    onClick={() => handleClickSuggestion(question)}
+                                >
+                                    ✨ {question}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 )}
                 {/* 스크롤 대상 빈 div */}
                 <div ref={messagesEndRef} />
