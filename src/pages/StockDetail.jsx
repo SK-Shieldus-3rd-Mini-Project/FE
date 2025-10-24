@@ -38,7 +38,7 @@ function Sparkline({points = [], height = 180}) {
 }
 
 export default function StockDetail() {
-    const { id } = useParams();
+    const { stockId: id } = useParams();
     const [data, setData] = useState(null);
     const [watch, setWatch] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -48,36 +48,58 @@ export default function StockDetail() {
 
     useEffect(() => {
         setWatch(localStorage.getItem(watchKey) === "1");
-    }, [watchKey]);
+    }, [watchKey, id]);
 
     useEffect(() => {
+        // [수정 2] id가 undefined이면 API를 호출하지 않습니다.
+        if (!id) {
+            setError("종목 코드가 없습니다.");
+            setLoading(false);
+            return;
+        }
+
         const fetchAll = async () => {
             setError(null);
             try {
-                // 1. 주식 상세 정보와 차트 데이터를 동시에 호출합니다.
-                const [detailRes, chartRes] = await Promise.all([
+                // [수정 2] AI 서버와 백엔드 서버를 동시에 호출합니다.
+                const [
+                    aiPriceRes,  // AI 서버 (가격/OHLC)
+                    aiChartRes,  // AI 서버 (차트)
+                    backendRes   // 백엔드 서버 (뉴스/리포트)
+                ] = await Promise.all([
+                    // 1. AI 서버 (pykrx 가격 정보)
                     fetch(`http://127.0.0.1:8001/api/stock/${id}`),
-                    fetch(`http://127.0.0.1:8001/api/stock/${id}/chart`)
+                    // 2. AI 서버 (pykrx 차트 정보)
+                    fetch(`http://127.0.0.1:8001/api/stock/${id}/chart`),
+                    // 3. 백엔드 서버 (DeepSearch 뉴스/리포트)
+                    fetch(`/api/stocks/${id}`) // vite 프록시가 :8080으로 연결
                 ]);
 
-                if (!detailRes.ok || !chartRes.ok) {
+                if (!aiPriceRes.ok || !aiChartRes.ok || !backendRes.ok) {
                     throw new Error('종목 정보를 가져오는 데 실패했습니다.');
                 }
 
-                const detail = await detailRes.json();
-                const chart = await chartRes.json();
+                const aiPriceData = await aiPriceRes.json();   // AI 서버 응답 1
+                const aiChartData = await aiChartRes.json();   // AI 서버 응답 2
+                const backendData = await backendRes.json(); // 백엔드 서버 응답
 
-                // 2. 모든 데이터를 하나로 합쳐서 state에 저장합니다.
+                // [수정 3] 두 서버의 응답을 하나로 합칩니다.
                 setData({
-                    ...detail,
-                    ...chart,
-                    // ▼▼▼ 여기가 핵심! AI 코멘트를 다시 임시 목데이터로 변경 ▼▼▼
-                    comment: "현재 저평가 구간이며, AI 반도체 수요로 중장기 성장 전망이 긍정적입니다.",
-                    // 뉴스, 리포트도 임시 데이터를 유지합니다.
-                    news: [ `${detail.name}, 새로운 모멘텀 발견`, `외국인, ${detail.name} 순매수 지속`, ],
-                    reports: [ { broker: "NH투자증권", target: "95,000원", stance: "매수" }, ],
-                    // 기술적 지표도 임시값을 사용합니다.
-                    tech: { rsi: 32, macd: 92351, ma20: 92351 },
+                    // --- AI 서버 (pykrx) ---
+                    name: aiPriceData.name,
+                    price: aiPriceData.price,
+                    changePct: aiPriceData.changePct,
+                    changeAmt: aiPriceData.changeAmt,
+                    ohlc: aiPriceData.ohlc,
+                    chart: aiChartData.chart,
+
+                    // --- 백엔드 (DeepSearch) ---
+                    news: backendData.news,
+                    reports: backendData.reports,
+
+                    // --- 임시 Mock (AI 서버가 추후 제공) ---
+                    foreignTicker: aiPriceData.foreignTicker || id,
+                    tech: aiPriceData.tech || { rsi: 32, macd: 92351, ma20: 92351 },
                 });
 
             } catch (e) {
@@ -88,13 +110,9 @@ export default function StockDetail() {
             }
         };
 
-        // 페이지에 처음 들어왔을 때 한 번 즉시 실행
         fetchAll();
 
-        // 5초마다 데이터 자동 새로고침 (폴링)
         const intervalId = setInterval(fetchAll, 5000);
-
-        // 페이지를 떠나면 반복을 멈춤
         return () => clearInterval(intervalId);
     }, [id]);
 
@@ -108,9 +126,9 @@ export default function StockDetail() {
     return <div className="sd-wrap"><div className="sd-skel">불러오는 중…</div></div>;
   }
 
-  if (error || !data) {
+    if (error || !data) {
         return <div className="sd-wrap"><div className="sd-error">{error || '데이터를 불러오지 못했어요.'}</div></div>;
-  }
+    }
 
   const {
     name, foreignTicker, price, changePct, changeAmt,
@@ -119,62 +137,61 @@ export default function StockDetail() {
 
   const fmt = (n) => n?.toLocaleString("ko-KR");
 
-  return (
-    <div className="sd-wrap">
-      {/* 헤더줄 */}
-      <div className="sd-header">
-        <div className="sd-breadcrumb">종목 상세</div>
-        <button className={`sd-watch ${watch ? "on" : ""}`} onClick={toggleWatch} aria-label="관심등록">
-          <span className="sd-seal">關心</span>
-          <span className="sd-watch-text">{watch ? "관심등록 중" : "관심등록"}</span>
-        </button>
-      </div>
+    return (
+        <div className="sd-wrap">
+            {/* 헤더줄 */}
+            <div className="sd-header">
+                <div className="sd-breadcrumb">종목 상세</div>
+                <button className={`sd-watch ${watch ? "on" : ""}`} onClick={toggleWatch} aria-label="관심등록">
+                    <span className="sd-seal">關心</span>
+                    <span className="sd-watch-text">{watch ? "관심등록 중" : "관심등록"}</span>
+                </button>
+            </div>
 
-      {/* 타이틀/가격 */}
-      <div className="sd-title">
-        <div className="sd-name">{name}</div>
-        <div className="sd-ticker">{foreignTicker}</div>
-        <div className="sd-price">₩{fmt(price)}</div>
-        <div className={`sd-change ${changePct >= 0 ? "up" : "down"}`}>
-          {changePct >= 0 ? "+" : ""}{changePct}% {changePct >= 0 ? "▲" : "▼"} {changePct >= 0 ? "+" : ""}{fmt(changeAmt)}
+            {/* 타이틀/가격 */}
+            <div className="sd-title">
+                <div className="sd-name">{name}</div>
+                <div className="sd-ticker">{foreignTicker}</div>
+                <div className="sd-price">₩{fmt(price)}</div>
+                <div className={`sd-change ${changePct >= 0 ? "up" : "down"}`}>
+                    {changePct >= 0 ? "+" : ""}{changePct}% {changePct >= 0 ? "▲" : "▼"} {changePct >= 0 ? "+" : ""}{fmt(changeAmt)}
+                </div>
+            </div>
+
+            {/* 차트 */}
+            <div className="sd-chart-wrap">
+                <Sparkline points={chart} />
+            </div>
+
+            {/* 요약 스탯 (AI 서버 데이터) */}
+            <div className="sd-stats">
+                <StatCard label="시가" value={fmt(ohlc?.open)} />
+                <StatCard label="저가" value={fmt(ohlc?.low)} />
+                <StatCard label="고가" value={fmt(ohlc?.high)} />
+                <StatCard label="RSI" value={tech?.rsi} />
+                <StatCard label="MACD" value={fmt(tech?.macd)} />
+                <StatCard label="이동평균선" value={fmt(tech?.ma20)} />
+            </div>
+
+            {/* 최근 뉴스 (백엔드 서버 데이터) */}
+            <section className="sd-section">
+                <h3 className="sd-sec-title">최근 뉴스</h3>
+                <ul className="sd-list">
+                    {news?.map((n, i) => <li key={i} className="sd-list-item">• {n}</li>)}
+                </ul>
+            </section>
+
+            {/* 증권사 리포트 (백엔드 서버 데이터) */}
+            <section className="sd-section">
+                <h3 className="sd-sec-title">증권사 리포트</h3>
+                <ul className="sd-list">
+                    {reports?.map((r, i) => (
+                        <li key={i} className="sd-list-item">
+                            {r.broker}: 목표주가 {r.target} ({r.stance})
+                        </li>
+                    ))}
+                </ul>
+            </section>
         </div>
-      </div>
-
-      {/* 차트 */}
-      <div className="sd-chart-wrap">
-        <Sparkline points={chart} />
-      </div>
-
-      {/* 요약 스탯 */}
-      <div className="sd-stats">
-        <StatCard label="시가" value={fmt(ohlc.open)} />
-        <StatCard label="저가" value={fmt(ohlc.low)} />
-        <StatCard label="고가" value={fmt(ohlc.high)} />
-        <StatCard label="RSI" value={tech.rsi} />
-        <StatCard label="MACD" value={fmt(tech.macd)} />
-        <StatCard label="이동평균선" value={fmt(tech.ma20)} />
-      </div>
-
-      {/* 최근 뉴스 */}
-      <section className="sd-section">
-        <h3 className="sd-sec-title">최근 뉴스</h3>
-        <ul className="sd-list">
-          {news.map((n, i) => <li key={i} className="sd-list-item">• {n}</li>)}
-        </ul>
-      </section>
-
-      {/* 증권사 리포트 */}
-      <section className="sd-section">
-        <h3 className="sd-sec-title">증권사 리포트</h3>
-        <ul className="sd-list">
-          {reports.map((r, i) => (
-            <li key={i} className="sd-list-item">
-              {r.broker}: 목표주가 {r.target} ({r.stance})
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
-  );
+    );
 }
-
