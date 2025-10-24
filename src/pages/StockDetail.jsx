@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
-import api from "../lib/api"; // [추가] 백엔드 API
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../lib/api";
 import "./../assets/StockDetail.css";
 
-// 작게 쓰는 공용 카드
+// (StatCard, Sparkline 함수는 기존과 동일)
 function StatCard({ label, value }) {
-    // ... (이하 동일)
     return (
         <div className="sd-stat-card">
             <div className="sd-stat-label">{label}</div>
@@ -14,9 +13,7 @@ function StatCard({ label, value }) {
     );
 }
 
-// 간단 스파크라인 (SVG)
 function Sparkline({ points = [], height = 180 }) {
-    // ... (이하 동일)
     const width = 640;
     const path = useMemo(() => {
         if (!points.length) return "";
@@ -39,52 +36,80 @@ function Sparkline({ points = [], height = 180 }) {
     );
 }
 
+
 export default function StockDetail() {
     const { stockId: id } = useParams();
+    const navigate = useNavigate();
     const [data, setData] = useState(null);
     const [watch, setWatch] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const watchKey = `watch:${id}`; // localStorage 키는 유지 (UI 즉각 반응용)
+    // [수정] 포트폴리오 폼 State
+    const [quantity, setQuantity] = useState("");
+    const [avgPrice, setAvgPrice] = useState("");
+    // [신규] 기존 보유 여부 확인용 State
+    const [existingPortfolio, setExistingPortfolio] = useState(null);
 
-    // 페이지 로드 시 localStorage를 확인해 '관심' 상태를 초기화
+    // 데이터 로딩 (Watchlist, Portfolio 모두 가져오도록 수정)
     useEffect(() => {
-        setWatch(localStorage.getItem(watchKey) === "1");
-    }, [watchKey, id]);
-
-    // 데이터 페칭 useEffect (기존과 동일)
-    useEffect(() => {
-        if (!id) {
-            setError("종목 코드가 없습니다.");
+        const userId = localStorage.getItem('userId');
+        if (!id || !userId) {
+            setError("종목 코드 또는 userId가 없습니다.");
             setLoading(false);
             return;
         }
 
         const fetchAll = async () => {
             setError(null);
+            setLoading(true); // 로딩 시작
             try {
                 const [
                     aiPriceRes,
                     aiChartRes,
-                    backendRes
+                    backendRes,
+                    watchlistRes,
+                    portfolioRes // [신규] 보유 목록 API 호출
                 ] = await Promise.all([
                     fetch(`http://127.0.0.1:8001/api/stock/${id}`),
                     fetch(`http://127.0.0.1:8001/api/stock/${id}/chart`),
-                    fetch(`/api/stocks/${id}`)
+                    fetch(`/api/stocks/${id}`),
+                    api.get(`/api/users/${userId}/watchlist`),
+                    api.get(`/api/users/${userId}/portfolio`) // [신규]
                 ]);
 
-                if (!aiPriceRes.ok || !aiChartRes.ok || !backendRes.ok) {
+                // (에러 체크 ...)
+                if (!aiPriceRes.ok || !aiChartRes.ok || !backendRes.ok || !watchlistRes.status === 200 || !portfolioRes.status === 200) {
                     throw new Error('종목 정보를 가져오는 데 실패했습니다.');
                 }
 
                 const aiPriceData = await aiPriceRes.json();
                 const aiChartData = await aiChartRes.json();
                 const backendData = await backendRes.json();
+                const watchlistData = watchlistRes.data;
+                const portfolioData = portfolioRes.data; // [신규]
 
+                // 1. 관심종목 상태 설정
+                const isWatched = watchlistData.some(item => item.stockId === id);
+                setWatch(isWatched);
+
+                // 2. [신규] 보유종목 상태 설정 (폼 자동 채우기)
+                const existingItem = portfolioData.find(item => item.stockId === id);
+                if (existingItem) {
+                    setExistingPortfolio(existingItem);
+                    setQuantity(existingItem.quantity);
+                    setAvgPrice(existingItem.avgPurchasePrice);
+                } else {
+                    setExistingPortfolio(null);
+                    setQuantity("");
+                    setAvgPrice("");
+                }
+
+                // 3. 페이지 데이터 설정
                 setData({
                     name: aiPriceData.name,
                     price: aiPriceData.price,
+                    // (이하 동일)
                     changePct: aiPriceData.changePct,
                     changeAmt: aiPriceData.changeAmt,
                     ohlc: aiPriceData.ohlc,
@@ -99,50 +124,69 @@ export default function StockDetail() {
                 console.error(e);
                 setError("데이터를 불러오지 못했어요.");
             } finally {
-                if (loading) setLoading(false);
+                setLoading(false); // 로딩 종료
             }
         };
 
         fetchAll();
-
-        const intervalId = setInterval(fetchAll, 5000);
-        return () => clearInterval(intervalId);
+        // [수정] 의존성 배열에서 loading 제거 (무한 루프 방지)
     }, [id]);
 
-    // [수정] 관심종목 토글 함수 (API 연동)
+    // (관심종목 토글 함수 - 기존과 동일)
     const toggleWatch = async () => {
         const userId = localStorage.getItem('userId');
         if (!userId) {
-            alert("로그인이 필요합니다."); // 또는 로그인 페이지로 리다이렉트
+            alert("로그인이 필요합니다.");
             return;
         }
-
-        // 1. UI 즉시 업데이트 (Optimistic Update)
         const next = !watch;
         setWatch(next);
-
-        // 2. localStorage 업데이트 (다른 페이지와의 동기화용)
-        localStorage.setItem(watchKey, next ? "1" : "0");
-
         try {
             if (next) {
-                // 3-1. 관심 종목 추가 API 호출
-                // POST /api/users/{userId}/watchlist
-                // Body: { "stockId": "..." }
                 await api.post(`/api/users/${userId}/watchlist`, { stockId: id });
-                alert("관심종목에 추가되었습니다.");
             } else {
-                // 3-2. 관심 종목 삭제 API 호출
-                // DELETE /api/users/{userId}/watchlist/{stockId}
                 await api.delete(`/api/users/${userId}/watchlist/${id}`);
-                alert("관심종목에서 제거되었습니다.");
             }
         } catch (err) {
             console.error("관심종목 처리 실패:", err);
-            // 4. API 실패 시 UI 롤백 (선택적)
             alert("요청 처리에 실패했습니다. 다시 시도해 주세요.");
-            setWatch(!next); // UI 상태를 원래대로 되돌림
-            localStorage.setItem(watchKey, !next ? "1" : "0");
+            setWatch(!next);
+        }
+    };
+
+    // [수정] 보유 종목 추가 (POST) / 수정 (PUT) 핸들러
+    const handlePortfolioSubmit = async () => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) return alert("로그인이 필요합니다.");
+
+        const numQuantity = parseInt(quantity, 10);
+        const numAvgPrice = parseInt(avgPrice, 10);
+
+        if (!numQuantity || numQuantity <= 0) return alert("보유 수량을 올바르게 입력하세요.");
+        if (!numAvgPrice || numAvgPrice <= 0) return alert("평균 매수 단가를 올바르게 입력하세요.");
+
+        // DTO에 맞춘 페이로드
+        const payload = {
+            stockId: id,
+            quantity: numQuantity,
+            avgPurchasePrice: numAvgPrice
+        };
+
+        try {
+            if (existingPortfolio) {
+                // --- 1. 이미 존재: 수정 (PUT) ---
+                await api.put(`/api/users/${userId}/portfolio/${id}`, payload);
+                alert(`${data.name} 종목이 수정되었습니다.`);
+            } else {
+                // --- 2. 신규: 추가 (POST) ---
+                await api.post(`/api/users/${userId}/portfolio`, payload);
+                alert(`${data.name} 종목이 보유 목록에 추가되었습니다.`);
+            }
+            navigate('/watchlist'); // 성공 시 '내 주식' 페이지로 이동
+
+        } catch (err) {
+            console.error("보유 종목 처리 실패:", err);
+            alert("요청 처리에 실패했습니다.");
         }
     };
 
@@ -164,17 +208,16 @@ export default function StockDetail() {
 
     return (
         <div className="sd-wrap">
-            {/* 헤더줄 */}
+            {/* (헤더) */}
             <div className="sd-header">
                 <div className="sd-breadcrumb">종목 상세</div>
-                {/* [수정] 버튼 클릭 시 수정된 toggleWatch 함수 호출 */}
                 <button className={`sd-watch ${watch ? "on" : ""}`} onClick={toggleWatch} aria-label="관심등록">
                     <span className="sd-seal">關心</span>
                     <span className="sd-watch-text">{watch ? "관심등록됨" : "관심등록"}</span>
                 </button>
             </div>
 
-            {/* 타이틀/가격 */}
+            {/* (제목/가격/차트/스탯 ... 기존과 동일) */}
             <div className="sd-title">
                 <div className="sd-name">{name}</div>
                 <div className="sd-ticker">{foreignTicker}</div>
@@ -183,13 +226,9 @@ export default function StockDetail() {
                     {changePct >= 0 ? "+" : ""}{changePct}% {changePct >= 0 ? "▲" : "▼"} {changePct >= 0 ? "+" : ""}{fmt(changeAmt)}
                 </div>
             </div>
-
-            {/* 차트 */}
             <div className="sd-chart-wrap">
                 <Sparkline points={chart} />
             </div>
-
-            {/* 요약 스탯 (AI 서버 데이터) */}
             <div className="sd-stats">
                 <StatCard label="시가" value={fmt(ohlc?.open)} />
                 <StatCard label="저가" value={fmt(ohlc?.low)} />
@@ -199,15 +238,49 @@ export default function StockDetail() {
                 <StatCard label="이동평균선" value={fmt(tech?.ma20)} />
             </div>
 
-            {/* 최근 뉴스 (백엔드 서버 데이터) */}
+            {/* --- [수정] 보유 종목 추가/수정 폼 --- */}
+            <section className="sd-section sd-add-portfolio">
+                {/* [수정] 폼 제목 변경 */}
+                <h3 className="sd-sec-title">
+                    {existingPortfolio ? "보유 종목 수정" : "보유 종목에 추가"}
+                </h3>
+                <div className="sd-portfolio-form">
+                    <div className="sd-form-group">
+                        <label htmlFor="quantity">보유 수량</label>
+                        <input
+                            type="number"
+                            id="quantity"
+                            value={quantity}
+                            onChange={(e) => setQuantity(e.target.value)}
+                            placeholder="예: 10"
+                            min="1"
+                        />
+                    </div>
+                    <div className="sd-form-group">
+                        <label htmlFor="avgPrice">평균 매수 단가 (원)</label>
+                        <input
+                            type="number"
+                            id="avgPrice"
+                            value={avgPrice}
+                            onChange={(e) => setAvgPrice(e.target.value)}
+                            placeholder="예: 80000"
+                            min="1"
+                        />
+                    </div>
+                    {/* [수정] 버튼 텍스트 변경 */}
+                    <button className="sd-add-btn" onClick={handlePortfolioSubmit}>
+                        {existingPortfolio ? "수정하기" : "추가하기"}
+                    </button>
+                </div>
+            </section>
+
+            {/* (뉴스, 리포트 섹션 - 기존과 동일) */}
             <section className="sd-section">
                 <h3 className="sd-sec-title">최근 뉴스</h3>
                 <ul className="sd-list">
                     {news?.map((n, i) => <li key={i} className="sd-list-item">{n}</li>)}
                 </ul>
             </section>
-
-            {/* 증권사 리포트 (백엔드 서버 데이터) */}
             <section className="sd-section">
                 <h3 className="sd-sec-title">증권사 리포트</h3>
                 <ul className="sd-list">
