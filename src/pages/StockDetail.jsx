@@ -114,7 +114,7 @@ export default function StockDetail() {
 
   const {
     name, foreignTicker, price, changePct, changeAmt,
-    ohlc, tech, chart, news, reports, comment
+    ohlc, tech, chart, news, reports
   } = data;
 
   const fmt = (n) => n?.toLocaleString("ko-KR");
@@ -174,12 +174,6 @@ export default function StockDetail() {
           ))}
         </ul>
       </section>
-
-      {/* AI 한마디 */}
-      <div className="sd-quote">
-        <div className="sd-quote-cap">전봉준의 한마디</div>
-        <blockquote>“{comment}”</blockquote>
-      </div>
     </div>
   );
 }

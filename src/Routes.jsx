@@ -20,7 +20,7 @@ export default function AppRoutes() {
             path='/news'
             element={<LatestNews />}
         />
-      <Route path="/stock/:id" element={<StockDetail />} />
+      <Route path="/stock/:stockId" element={<StockDetail />} />
       <Route path="/watchlist" element={<WatchlistPage />} />
 
       {/* 404 진단용 */}
