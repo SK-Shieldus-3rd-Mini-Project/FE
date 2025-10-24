@@ -95,11 +95,11 @@ function Nav() {
             <div className="nav-section nav-right">
                 <ul className="nav-links">
                     <li><Link to="/news">최신 뉴스</Link></li>
-                    <li><Link to="/watchlist">나의 자산</Link></li>                   
+                    <li><Link to="/watchlist">나의 자산</Link></li>
                     <li>
-                        <Link 
-                            to="/chat" 
-                            onClick={async (e) => { 
+                        <Link
+                            to="/chat"
+                            onClick={async (e) => {
                                 e.preventDefault();
                                 const success = await handleGoToLatestChat(navigate);
                                 if (!success) {

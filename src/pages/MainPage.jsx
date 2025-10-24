@@ -10,6 +10,7 @@ import TopGainers from '../components/dashboard/TopGainers.jsx';
 import TopLosers from '../components/dashboard/TopLosers.jsx';
 import TopVolume from '../components/dashboard/TopVolume.jsx';
 import TopMarketCap from '../components/dashboard/TopMarketCap.jsx';
+import InlineLoader from "../components/InlineLoader.jsx";
 
 const MarketSummary = () => <div>시장 요약 텍스트...</div>;
 const MajorNews = () => <div>관심 종목...</div>;
@@ -43,7 +44,7 @@ function MainPage() {
             });
     }, []); 
 
-    if (loading) return <div className="loading-screen">전체 대시보드 데이터를 불러오는 중...</div>;
+    if (loading) return <InlineLoader/>;
     if (error) return <div className="error-screen" style={{color: 'red', padding: '20px'}}>오류: {error}</div>;
 
     return (

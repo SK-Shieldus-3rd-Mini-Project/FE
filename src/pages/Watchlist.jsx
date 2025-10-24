@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../lib/api"; // 백엔드 API
 import "../assets/Watchlist.css";
+import InlineLoader from "../components/InlineLoader.jsx";
 
 // (AI 서버 fetch 함수는 기존과 동일)
 const fetchPriceFromAI = async (stockId) => {
@@ -227,7 +228,7 @@ export default function Watchlist() {
         </div>
 
         <div className="wl-card">
-          {loading ? ( <div className="wl-skel">불러오는 중…</div> )
+          {loading ? ( <InlineLoader /> )
               : rows.length === 0 ? (
                   <div className="wl-empty">
                     {tab === "watch"

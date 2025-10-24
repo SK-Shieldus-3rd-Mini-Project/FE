@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../lib/api";
 import "./../assets/StockDetail.css";
+import InlineLoader from "../components/InlineLoader.jsx";
 
 // (StatCard, Sparkline 함수는 기존과 동일)
 function StatCard({ label, value }) {
@@ -192,7 +193,7 @@ export default function StockDetail() {
 
 
     if (loading) {
-        return <div className="sd-wrap"><div className="sd-skel">불러오는 중…</div></div>;
+        return <div className="sd-wrap"><InlineLoader/></div>;
     }
 
     if (error || !data) {

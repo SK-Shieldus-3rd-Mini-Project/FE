@@ -13,8 +13,7 @@ function ChatPage() {
     };
 
     return (
-        <div className={`chat-layout-container ${isSidebarOpen ? 'shifted' : ''}`}>
-            <ChatList isOpen={isSidebarOpen} onToggle={toggleSidebar} />
+        <div className={`chat-layout-container ${isSidebarOpen ? 'shifted' : ''}`} style={{ margin: '1rem auto', maxWidth: '1200px' }}>            <ChatList isOpen={isSidebarOpen} onToggle={toggleSidebar} />
 
             <main className="main-content">
                 <Outlet />

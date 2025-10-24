@@ -10,15 +10,14 @@
 }
 
 .chat-list-sidebar {
-    position: fixed; 
+    position: relative;
     left: calc(-1 * var(--sidebar-width) + var(--rail-width));
-    top: 0px; 
     width: var(--sidebar-width);
-    height: 100vh; 
+    height: calc(100vh - var(--nav-height));
     background-color: var(--theme-light-bg);
     border-right: 1px solid var(--theme-light-border);
     padding: 1rem;
-    padding-top: 20px; 
+    padding-top: 20px;
     box-sizing: border-box;
     overflow-y: auto;
     z-index: 500;

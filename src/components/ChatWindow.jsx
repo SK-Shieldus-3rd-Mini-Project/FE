@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../lib/api'; // api 임포트
 import '../assets/ChatWindow.css';
+import Chatloader from "./ChatLoader.jsx";
 
 // ⭐️⭐️⭐️ 1. 전체 추천 질문 목록 정의 (함수 외부에 위치) ⭐️⭐️⭐️
 const ALL_SUGGESTIONS = [
@@ -218,7 +219,8 @@ function ChatWindow() {
                                         <div className="pending-indicator">
                                             <div className="dot-typing"></div>
                                         </div>
-                                        <p style={{ margin: 0, padding: 0 }}>AI가 응답을 생성하는 중입니다...</p>
+                                        <Chatloader/>
+                                        <p style={{ margin: 0, padding: 0 }}>전봉준 AI가 답변을 작성중이오...</p>
                                     </>
                                 ) : (
                                     <p style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</p>

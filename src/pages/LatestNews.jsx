@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import NewsModal from '../components/NewsModal.jsx'; // 1. 모달 컴포넌트 import
 import api from '../lib/api.js';
 import '../assets/LatestNews.css';
+import InlineLoader from "../components/InlineLoader.jsx";
 
 function LatestNews() {
     const [newsList, setNewsList] = useState([]);
@@ -35,7 +36,7 @@ function LatestNews() {
     };
 
     if (isLoading) {
-        return <div className="news-container"><h3>최신 뉴스 로딩 중...</h3></div>;
+        return <InlineLoader/>;
     }
 
     return (
