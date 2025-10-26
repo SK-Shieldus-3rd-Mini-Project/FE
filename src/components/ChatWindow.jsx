@@ -222,7 +222,7 @@ function ChatWindow() {
                                         <Chatloader/>
                                         <p style={{ margin: 0, padding: 0 }}>전봉준 AI가 답변을 작성중이오...</p>
                                     </>
-                                ) : (
+                                ) : ( 
                                     <p style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</p>
                                 )}
                             </div>
