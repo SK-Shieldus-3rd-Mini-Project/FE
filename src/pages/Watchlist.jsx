@@ -102,12 +102,15 @@ export default function Watchlist() {
         const profitAmt = (currentPrice - avgPrice) * quantity;
         const totalValue = currentPrice * quantity; // [신규] 평가액 계산
 
+        // [수정] 보유 수익률은 사용자의 평균 매수가 기준으로 계산
+        const profitPct = avgPrice > 0 ? ((currentPrice - avgPrice) / avgPrice) * 100 : 0;
+
         return {
           id: item.stockId,
           name: item.stockName,
           price: currentPrice,
           quantity: quantity,
-          profit: item.gainLossPct,
+          profit: profitPct, // [변경] 포트폴리오 기준 수익률
           profitAmt: profitAmt,
           avgPurchasePrice: avgPrice,
           totalValue: totalValue // [신규] 평가액 state에 추가
