@@ -7,3 +7,8 @@
     --theme-light-text: #213547; /* 기본 텍스트 (어두운 회색) */
     --theme-light-text-secondary: #555;
 }
+
+/* --- 전역 폰트 적용 --- */
+body {
+    font-family: 'Gowun Batang', 'Malgun Gothic', serif;
+}

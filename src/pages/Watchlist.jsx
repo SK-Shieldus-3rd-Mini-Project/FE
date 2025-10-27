@@ -7,7 +7,7 @@ import InlineLoader from "../components/InlineLoader.jsx";
 // (AI 서버 fetch 함수는 기존과 동일)
 const fetchPriceFromAI = async (stockId) => {
   try {
-    const res = await fetch(`http://127.0.0.1:8001/api/stock/${stockId}`);
+    const res = await fetch(`ai/api/stock/${stockId}`);
     if (!res.ok) {
       throw new Error(`AI server request failed for ${stockId}`);
     }
