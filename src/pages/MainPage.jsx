@@ -13,8 +13,6 @@ import TopMarketCap from '../components/dashboard/TopMarketCap.jsx';
 import InlineLoader from "../components/InlineLoader.jsx";
 import WatchlistSummary from '../components/dashboard/WatchlistSummary.jsx';
 
-const MarketSummary = () => <div>시장 요약 텍스트...</div>;
-
 const DashboardCard = ({ title, children }) => (
     <div className="dashboard-card">
         <h2 className="dashboard-card-title">{title}</h2>
@@ -66,8 +64,6 @@ function MainPage() {
                                 </DashboardCard>
                             </div>
                         </div>
-
-                        <DashboardCard title="시장 요약"><MarketSummary /></DashboardCard>
 
                         <div className="bottom-row-container">
                             <div className="bottom-row-item">

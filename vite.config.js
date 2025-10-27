@@ -15,7 +15,7 @@ export default defineConfig({
 
             // 2. AI 서버 API (포트 8001)
             '/ai': {
-                target: 'http://127.0.0.1:8001', // Python AI 서버
+                target: 'http://127.0.0.1:8000', // Python AI 서버
                 changeOrigin: true,
             }
         }
