@@ -76,7 +76,7 @@ export default function StockDetail() {
                     fetch(`/ai/api/stock/${id}/chart`),
                     fetch(`/api/stocks/${id}`),
                     api.get(`/api/users/${userId}/watchlist`),
-                    api.get(`/api/users/${userId}/portfolio`) // [신규]
+                    api.get(`/api/users/${userId}/portfolio`)
                 ]);
 
                 // (에러 체크 ...)
