@@ -33,7 +33,7 @@ function WatchlistSummary() {
 
                 const tickers = watchlistFromJava.map(item => item.stockId);
 
-                const pricesRes = await fetch('ai/api/stock-details', {
+                const pricesRes = await fetch('/ai/api/stock-details', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ tickers }),
