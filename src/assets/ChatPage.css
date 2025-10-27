@@ -16,6 +16,7 @@
     overflow: hidden;
     background-color: #ffffff;
     transition: transform 0.3s ease;
+    font-family: 'Gowun Batang', 'Malgun Gothic', serif;
 }
 
 /* 🔥 사이드바 열렸을 때 컨테이너 전체가 이동 */

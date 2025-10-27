@@ -10,7 +10,7 @@
     background-color: var(--theme-light-beige-bg);
     display: flex;
     flex-direction: column;
-    font-family: sans-serif;
+    /* font-family: sans-serif; */
     min-height: 100vh;
 }
 

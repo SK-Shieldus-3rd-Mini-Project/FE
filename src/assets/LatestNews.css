@@ -15,6 +15,7 @@
     border: 1px solid var(--theme-light-border);
     padding: 2rem 3rem;
     border-radius: 12px;
+    font-family: 'Gowun Batang', 'Malgun Gothic', serif;
 }
 
 .section-title {
@@ -76,6 +77,7 @@
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.2s, color 0.2s;
+    font-family: 'Gowun Batang', 'Malgun Gothic', serif;
 }
 
 .read-more-button:hover {

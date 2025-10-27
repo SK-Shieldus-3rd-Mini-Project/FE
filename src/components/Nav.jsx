@@ -69,7 +69,7 @@ function Nav() {
                     <span className="search-icon">🔍</span>
                     <input
                         type="text"
-                        placeholder="종목명 또는 코드를 검색하세요"
+                        placeholder="종목명 또는 코드를 검색하시오."
                         className="search-input"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
