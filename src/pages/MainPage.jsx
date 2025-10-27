@@ -11,9 +11,9 @@ import TopLosers from '../components/dashboard/TopLosers.jsx';
 import TopVolume from '../components/dashboard/TopVolume.jsx';
 import TopMarketCap from '../components/dashboard/TopMarketCap.jsx';
 import InlineLoader from "../components/InlineLoader.jsx";
+import WatchlistSummary from '../components/dashboard/WatchlistSummary.jsx';
 
 const MarketSummary = () => <div>시장 요약 텍스트...</div>;
-const MajorNews = () => <div>관심 종목...</div>;
 
 const DashboardCard = ({ title, children }) => (
     <div className="dashboard-card">
@@ -34,7 +34,7 @@ function MainPage() {
                 return res.json();
             })
             .then(data => {
-                setDashboardData(data); 
+                setDashboardData(data);
             })
             .catch(err => {
                 setError(err.message);
@@ -42,10 +42,10 @@ function MainPage() {
             .finally(() => {
                 setLoading(false);
             });
-    }, []); 
+    }, []);
 
-    if (loading) return <InlineLoader/>;
-    if (error) return <div className="error-screen" style={{color: 'red', padding: '20px'}}>오류: {error}</div>;
+    if (loading) return <InlineLoader />;
+    if (error) return <div className="error-screen" style={{ color: 'red', padding: '20px' }}>오류: {error}</div>;
 
     return (
         <div className="main-page-container">
@@ -80,7 +80,7 @@ function MainPage() {
                     </div>
 
                     <div className="dashboard-sidebar">
-                        <DashboardCard title="관심 종목"><MajorNews /></DashboardCard>
+                        <DashboardCard title="관심 종목"><WatchlistSummary /></DashboardCard>
                         <DashboardCard title="거래량 상위"><TopVolume data={dashboardData?.topVolume} /></DashboardCard>
                         <DashboardCard title="시가총액 상위"><TopMarketCap data={dashboardData?.topMarketCap} /></DashboardCard>
                     </div>
