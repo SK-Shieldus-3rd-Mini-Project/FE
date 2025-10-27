@@ -72,8 +72,8 @@ export default function StockDetail() {
                     watchlistRes,
                     portfolioRes // [신규] 보유 목록 API 호출
                 ] = await Promise.all([
-                    fetch(`http://127.0.0.1:8001/api/stock/${id}`),
-                    fetch(`http://127.0.0.1:8001/api/stock/${id}/chart`),
+                    fetch(`ai/api/stock/${id}`),
+                    fetch(`ai/api/stock/${id}/chart`),
                     fetch(`/api/stocks/${id}`),
                     api.get(`/api/users/${userId}/watchlist`),
                     api.get(`/api/users/${userId}/portfolio`) // [신규]

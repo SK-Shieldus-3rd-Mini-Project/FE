@@ -28,7 +28,7 @@ function MainPage() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch('http://127.0.0.1:8001/api/dashboard')
+        fetch('ai/api/dashboard')
             .then(res => {
                 if (!res.ok) throw new Error('대시보드 데이터를 가져오는데 실패했습니다.');
                 return res.json();
