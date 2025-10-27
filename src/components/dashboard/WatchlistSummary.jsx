@@ -12,7 +12,7 @@ function WatchlistSummary() {
             setError('로그인이 필요합니다.');
             setLoading(false);
             return;
-        }
+        } 
 
         const fetchData = async () => {
             try {
