@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../lib/api";
+import api from "../lib/api.js"; 
 import "./../assets/StockDetail.css";
 import InlineLoader from "../components/InlineLoader.jsx";
 
@@ -44,7 +44,7 @@ export default function StockDetail() {
     const [data, setData] = useState(null);
     const [watch, setWatch] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState(null); 
 
     // [수정] 포트폴리오 폼 State
     const [quantity, setQuantity] = useState("");
@@ -83,7 +83,7 @@ export default function StockDetail() {
                 if (!aiPriceRes.ok || !aiChartRes.ok || !backendRes.ok || !watchlistRes.status === 200 || !portfolioRes.status === 200) {
                     throw new Error('종목 정보를 가져오는 데 실패했습니다.');
                 }
-
+                
                 const aiPriceData = await aiPriceRes.json();
                 const aiChartData = await aiChartRes.json();
                 const backendData = await backendRes.json();
@@ -106,7 +106,7 @@ export default function StockDetail() {
                     setAvgPrice("");
                 }
 
-                // 3. 페이지 데이터 설정
+                // 3. 페이지 데이터 설정 
                 setData({
                     name: aiPriceData.name,
                     price: aiPriceData.price,
@@ -114,16 +114,17 @@ export default function StockDetail() {
                     changePct: aiPriceData.changePct,
                     changeAmt: aiPriceData.changeAmt,
                     ohlc: aiPriceData.ohlc,
-                    chart: aiChartData.chart,
+                    chart: aiChartData.chart, 
                     news: backendData.news,
                     reports: backendData.reports,
                     foreignTicker: aiPriceData.foreignTicker || id,
-                    tech: aiPriceData.tech || { rsi: 32, macd: 92351, ma20: 92351 },
+                    // 백엔드에서 받아온 tech 데이터를 초기값으로 사용
+                    tech: backendData.tech || { rsi: 0, macd: 0, ma20: 0 }, 
                 });
 
             } catch (e) {
                 console.error(e);
-                setError("데이터를 불러오지 못했어요.");
+                setError(e.message || "데이터를 불러오지 못했어요."); 
             } finally {
                 setLoading(false); // 로딩 종료
             }
@@ -132,6 +133,47 @@ export default function StockDetail() {
         fetchAll();
         // [수정] 의존성 배열에서 loading 제거 (무한 루프 방지)
     }, [id]);
+
+
+
+    // ------------------------------------------------------------------
+    // 기술 지표 가져오기 (무한 루프 방지)
+    useEffect(() => {
+        
+        // 1. 데이터가 아직 로드되지 않았으면 실행x
+        if (!data) return; 
+        
+        // 2. 기술 지표가 이미 유효한 값으로 설정되었다면(0이 아니면) 재요청x
+        //    (단, 백엔드에서 0이 아닌 유효한 값을 받았다고 가정)
+        //    -> 백엔드에서 404 에러 시 0이 들어올 수 있으므로, 이 조건은 신중해야함
+        //    -> 단순하게 'id'가 변경될 때만 실행하는 것이 가장 안전
+
+        const fetchTechIndicators = async () => {
+            try {
+                const response = await api.post('/api/stocks/tech-indicators', { symbol: id });
+                
+                const { tech } = response.data;
+
+                setData((prevData) => {
+                    if (!prevData) return null;
+                    return {
+                        ...prevData,
+                        tech: tech, // 오직 tech 데이터만 업데이트
+                    };
+                });
+            } catch (error) {
+                setError(error.message || "기술 지표를 가져오지 못했습니다."); 
+            }
+        };
+        
+        fetchTechIndicators();
+        
+    // 💡 핵심 수정: 의존성 배열에서 `data`를 제거하고, `id`만 남김
+    //    종목 ID가 변경될 때만 이 훅이 실행
+    }, [id]);
+
+    // ------------------------------------------------------------------
+
 
     // (관심종목 토글 함수 - 기존과 동일)
     const toggleWatch = async () => {
@@ -163,8 +205,8 @@ export default function StockDetail() {
         const numQuantity = parseInt(quantity, 10);
         const numAvgPrice = parseInt(avgPrice, 10);
 
-        if (!numQuantity || numQuantity <= 0) return alert("보유 수량을 올바르게 입력하세요.");
-        if (!numAvgPrice || numAvgPrice <= 0) return alert("평균 매수 단가를 올바르게 입력하세요.");
+        if (isNaN(numQuantity) || numQuantity <= 0) return alert("보유 수량을 올바르게 입력하세요.");
+        if (isNaN(numAvgPrice) || numAvgPrice <= 0) return alert("평균 매수 단가를 올바르게 입력하세요.");
 
         // DTO에 맞춘 페이로드
         const payload = {
@@ -184,28 +226,26 @@ export default function StockDetail() {
                 alert(`${data.name} 종목이 보유 목록에 추가되었습니다.`);
             }
             navigate('/watchlist'); // 성공 시 '내 주식' 페이지로 이동
-
         } catch (err) {
             console.error("보유 종목 처리 실패:", err);
             alert("요청 처리에 실패했습니다.");
         }
     };
 
-
     if (loading) {
-        return <div className="sd-wrap"><InlineLoader/></div>;
+        return <div className="sd-wrap"><InlineLoader /></div>;
     }
 
     if (error || !data) {
         return <div className="sd-wrap"><div className="sd-error">{error || '데이터를 불러오지 못했어요.'}</div></div>;
     }
 
-    const {
-        name, foreignTicker, price, changePct, changeAmt,
-        ohlc, tech, chart, news, reports
-    } = data;
+    const { name, foreignTicker, price, changePct, changeAmt, ohlc, tech, chart, news, reports } = data;
+    
+    const fmt = (n) => n?.toLocaleString("ko-KR"); 
 
-    const fmt = (n) => n?.toLocaleString("ko-KR");
+    // RSI 값은 소수점을 가질 수 있으므로, 숫자 포맷팅 대신 toFixed(2)를 사용합니다.
+    const formatRsi = (n) => (typeof n === 'number' ? n.toFixed(2) : fmt(n));
 
     return (
         <div className="sd-wrap">
@@ -218,7 +258,7 @@ export default function StockDetail() {
                 </button>
             </div>
 
-            {/* (제목/가격/차트/스탯 ... 기존과 동일) */}
+            {/* (제목/가격/차트/스탯) */}
             <div className="sd-title">
                 <div className="sd-name">{name}</div>
                 <div className="sd-ticker">{foreignTicker}</div>
@@ -234,7 +274,8 @@ export default function StockDetail() {
                 <StatCard label="시가" value={fmt(ohlc?.open)} />
                 <StatCard label="저가" value={fmt(ohlc?.low)} />
                 <StatCard label="고가" value={fmt(ohlc?.high)} />
-                <StatCard label="RSI" value={tech?.rsi} />
+                {/* 💡 RSI는 toFixed(2)로 출력 */}
+                <StatCard label="RSI" value={formatRsi(tech?.rsi)} />
                 <StatCard label="MACD" value={fmt(tech?.macd)} />
                 <StatCard label="이동평균선" value={fmt(tech?.ma20)} />
             </div>
@@ -252,7 +293,7 @@ export default function StockDetail() {
                             type="number"
                             id="quantity"
                             value={quantity}
-                            onChange={(e) => setQuantity(e.target.value)}
+                            onChange={(e) => setQuantity(e.target.value)} 
                             placeholder="예: 10"
                             min="1"
                         />
@@ -263,12 +304,12 @@ export default function StockDetail() {
                             type="number"
                             id="avgPrice"
                             value={avgPrice}
-                            onChange={(e) => setAvgPrice(e.target.value)}
+                            onChange={(e) => setAvgPrice(e.target.value)} 
                             placeholder="예: 80000"
                             min="1"
                         />
                     </div>
-                    {/* [수정] 버튼 텍스트 변경 */}
+                     {/* [수정] 버튼 텍스트 변경 */}
                     <button className="sd-add-btn" onClick={handlePortfolioSubmit}>
                         {existingPortfolio ? "수정하기" : "추가하기"}
                     </button>
