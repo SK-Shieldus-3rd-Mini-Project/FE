@@ -248,7 +248,7 @@ export default function StockDetail() {
     const formatRsi = (n) => (typeof n === 'number' ? n.toFixed(2) : fmt(n));
 
     return (
-        <div className="sd-wrap"> 
+        <div className="sd-wrap">
             {/* (헤더) */}
             <div className="sd-header">
                 <div className="sd-breadcrumb">종목 상세</div>
@@ -258,7 +258,7 @@ export default function StockDetail() {
                 </button>
             </div>
 
-            {/* (제목/가격/차트/스탯) */}
+            {/* (제목/가격/차트/스탯) */} 
             <div className="sd-title">
                 <div className="sd-name">{name}</div>
                 <div className="sd-ticker">{foreignTicker}</div>
