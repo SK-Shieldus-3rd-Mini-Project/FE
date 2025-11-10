@@ -258,7 +258,7 @@ export default function StockDetail() {
                 </button>
             </div>
 
-            {/* (제목/가격/차트/스탯) */} 
+            {/* (제목/가격/차트/스탯) */}
             <div className="sd-title">
                 <div className="sd-name">{name}</div>
                 <div className="sd-ticker">{foreignTicker}</div>
