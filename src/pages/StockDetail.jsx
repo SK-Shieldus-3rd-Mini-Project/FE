@@ -243,7 +243,7 @@ export default function StockDetail() {
     const { name, foreignTicker, price, changePct, changeAmt, ohlc, tech, chart, news, reports } = data;
     
     const fmt = (n) => n?.toLocaleString("ko-KR"); 
-
+ 
     // RSI 값은 소수점을 가질 수 있으므로, 숫자 포맷팅 대신 toFixed(2)를 사용합니다.
     const formatRsi = (n) => (typeof n === 'number' ? n.toFixed(2) : fmt(n));
 
